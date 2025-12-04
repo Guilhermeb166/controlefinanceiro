@@ -1,23 +1,21 @@
 'use client'
 import { useState } from "react";
-
+import Model from "@/components/Model";
+import Table from "@/components/Table";
+import { useExpenses } from "@/context/AppContext"
+import { formatCurrency } from "@/utils/FormatCurrency";
 
 export default function Home() {
     const [isOpen, setIsOpen] = useState(false)
-    const [descricao, setDescricao] = useState('')
-    const [tipo, setTipo] = useState('')
-    const [valor, setValor] = useState('')
-    const [despesas, setDespesas] = useState([])
+    const { expenses } = useExpenses()
 
-    
-
-    const summary = despesas.reduce((acc, despesa)=>{
-        if (despesa.tipo === 'Crédito') {
-            acc.entradas += despesa.valor
-            acc.total += despesa.valor
+    const summary = expenses.reduce((acc, item)=>{
+        if (item.tipo === 'Receita') {
+            acc.entradas += item.valor
+            acc.total += item.valor
         } else {
-            acc.saidas -= despesa.valor
-            acc.total -= despesa.valor
+            acc.saidas -= item.valor
+            acc.total -= item.valor
         }
 
         return acc
@@ -27,16 +25,12 @@ export default function Home() {
         total: 0
     })
 
-
-    const formatarMoeda = (valor) => {
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    
-
     return (
         <main className="min-h-screen bg-neutral-200">
-            
+            <Model
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+            />
             <section className="h-60 bg-emerald-600 pt-8">
                 <div className="max-w-5xl mx-auto flex justify-between">
                     <h1 className="text-white text-4xl font-semibold ">Minhas Despesas</h1>
@@ -61,7 +55,7 @@ export default function Home() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-3xl font-semibold">{formatarMoeda(summary.entradas)}</h1>
+                        <h1 className="text-3xl font-semibold">{formatCurrency(summary.entradas)}</h1>
                     </div>
                     <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between">
                         <div className="flex justify-between items-center">
@@ -70,7 +64,7 @@ export default function Home() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-3xl font-semibold">{formatarMoeda(summary.saidas)}</h1>
+                        <h1 className="text-3xl font-semibold">{formatCurrency(summary.saidas)}</h1>
                     </div>
                     <div className="flex flex-col flex-1 bg-emerald-500 rounded border-gray-300 shadow-md p-3 justify-between">
                         <div className="flex justify-between items-center text-white">
@@ -79,32 +73,10 @@ export default function Home() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-white text-3xl font-semibold">{formatarMoeda(summary.total)}</h1>
+                        <h1 className="text-white text-3xl font-semibold">{formatCurrency(summary.total)}</h1>
                     </div>
                 </div>
-                <table className="max-w-5xl w-full mt-10 border-separate border-spacing-1 border-spacing-x-0">
-                    <thead>
-                        <tr>
-                            <th className="px-3 py-4 text-left">Data</th>
-                            <th className="px-3 py-4 text-left">Descrição</th>
-                            <th className="px-3 py-4 text-left">Preço</th>
-                            <th className="px-3 py-4 text-left">Tipo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {despesas.map((item)=>{
-                            return(
-                                <tr key={item.id}>
-                                    <td className="text-gray-400 px-3 py-4 bg-white rounded-l-lg">{item.data}</td>
-                                    <td className="text-gray-400 px-3 py-4 bg-white">{item.descricao}</td>
-                                    <td className="text-gray-400 px-3 py-4 bg-white">{item.valor}</td>
-                                    <td className={`text-gray-400 px-3 py-4 bg-white rounded-r-lg ${item.tipo==='Crédito' ? 'text-green-600' : 'text-red-600'}`}>{item.tipo}</td>
-                                </tr>
-                            )
-                        })}
-                        
-                    </tbody>
-                </table>
+                <Table expenses={expenses} />
             </section>
         </main>
     );
