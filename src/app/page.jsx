@@ -1,9 +1,12 @@
 'use client'
+
 import { useState } from "react";
+import ImportExtract from "@/components/ImportExtract";
 import Model from "@/components/Model";
 import Table from "@/components/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
+
 
 export default function Home() {
     const [isOpen, setIsOpen] = useState(false)
@@ -34,16 +37,31 @@ export default function Home() {
             <section className="h-60 bg-emerald-600 pt-8">
                 <div className="max-w-5xl mx-auto flex justify-between">
                     <h1 className="text-white text-4xl font-semibold ">Minhas Despesas</h1>
-                    <button
+                    <div className="flex items-center gap-3">
+                        <ImportExtract />
+                        <button
                         type="button"
                         className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
-                        onClick={()=> setIsOpen(true)}
-                    >
-                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        onClick={() => setIsOpen(true)}
+                        >
+                        <svg
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                        >
+                            <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 4.5v15m7.5-7.5h-15"
+                            />
                         </svg>
                         Nova Transação
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </section>
             <section className="max-w-5xl mx-auto">
