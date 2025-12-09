@@ -28,7 +28,7 @@ export default function LoginPage() {
             <button
                 type="button"
                 className="bg-red-600 text-white w-full p-2 rounded hover:bg-red-700"
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={() => signOut({ callbackUrl: "/" })}
             >
                 Sair
             </button>
@@ -44,7 +44,7 @@ export default function LoginPage() {
 
                 <button
                     type="button"
-                    className="mt-4 text-blue-600 text-sm underline w-full"
+                    className="mt-4 text-blue-600 text-sm w-full cursor-pointer"
                     onClick={()=>setMode(mode==="login" ? "register" : "login")}
                 >
                     {mode === "login"

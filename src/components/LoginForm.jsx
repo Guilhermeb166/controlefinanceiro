@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
-import { signIn } from "@/lib/auth"
-
+import { signIn } from "next-auth/react"
+import { MdEmail, MdLock, MdPerson, MdLogout, MdArrowForward } from "react-icons/md"
 
 export default function LoginForm() {
 
@@ -32,26 +32,44 @@ export default function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleLogin} onKeyDown={handleKeyDown} className="bg-white p-6 rounded-lg shadow-md w-80 flex-col">
-            <h1 className="text-2xl mb-4 font-semibold">Login</h1>
+    <form className="space-y-5" onKeyDown={handleKeyDown}>
+      <div className="relative group">
+        <MdEmail className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+        <input 
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+        />
+      </div>
 
-            <input
-                placeholder="Email"
-                className="border p-2 w-full mb-3"
-                onChange={e => setEmail(e.target.value)}
-            />
-            <input
-                placeholder="Senha"
-                type="password"
-                className="border p-2 w-full mb-3"
-                onChange={e => setPassword(e.target.value)}
-            />
+      <div className="relative group">
+        <MdLock className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
 
-            {error && <p className="text-red-500 mb-2">{error}</p>}
+        <input
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+        />
+      </div>
 
-            <button type="submit" className="bg-emerald-600 text-white w-full p-2 rounded">
-                Entrar
-            </button>
-        </form>
-    )
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm animate-shake">
+          {error}
+        </div>
+      )}
+
+      <button
+      type="button"
+        onClick={handleLogin}
+        className="cursor-pointer w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group"
+      >
+        Entrar
+        <MdArrowForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+      </button>
+    </form>
+  )
 }

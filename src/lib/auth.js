@@ -1,8 +1,7 @@
+//lib/auth.js
 import Credentials from "next-auth/providers/credentials"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcryptjs"
-
-const prisma = new PrismaClient()
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/backend/firebase"
 
 export const authOptions = {
   session: {
@@ -11,32 +10,40 @@ export const authOptions = {
   providers: [
     Credentials({
       name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Senha", type: "password" },
-      },
       async authorize(credentials) {
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        })
+        try {
+          const cred = await signInWithEmailAndPassword(
+              auth,
+              credentials.email,
+              credentials.password
+            )
 
-        if (!user) return null
+          const user = cred.user
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isValid) return null
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
+          return {
+            id: user.uid,
+            name: user.displayName || "",
+            email: user.email,
+          }
+        } catch {
+          return null
         }
       },
     }),
   ],
+  callbacks: {
+    async jwt ({ token, user }) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session ({ session, token }) {
+      session.user.id = token.id
+      return session
+    },
+  },
+
   pages: {
     signIn: "/login",
   },

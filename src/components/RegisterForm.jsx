@@ -3,7 +3,7 @@
 // biome-ignore assist/source/organizeImports: <>
 import { auth, db } from "@/backend/firebase"
 import { doc, setDoc } from "firebase/firestore"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import {useAppRouter} from "@/utils/useAppRouter"
 
@@ -21,8 +21,17 @@ export default function RegisterForm() {
         setError("")
         setSuccess("")
 
+        if (!name || !email || password.length < 6) {
+            setError("Preencha todos os campos (senha ≥ 6).")
+            return
+        }
+
         try {
             const cred = await createUserWithEmailAndPassword(auth, email, password)
+
+            await updateProfile(cred.user, {
+                displayName: name.trim(),
+            })
 
             await setDoc(doc(db, "users", cred.user.uid), {
                 name: name.trim(),
@@ -31,12 +40,10 @@ export default function RegisterForm() {
             })
 
             setSuccess("Conta criada! Agora faça login.")
-            setName("")
-            setEmail("")
-            setPassword("")
             router.goHome()
         } catch (err) {
-            setError("Erro ao criar conta: ", err)
+            console.error(err)
+            setError("Erro ao criar conta: ")
         }
     }
 

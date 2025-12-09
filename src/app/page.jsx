@@ -7,8 +7,10 @@ import Table from "@/components/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
 import {useAppRouter} from "@/utils/useAppRouter"
+import { useSession } from "next-auth/react"
 
 export default function Home() {
+    const { data: session } = useSession()
     const router = useAppRouter()
     const [isOpen, setIsOpen] = useState(false)
     const { expenses } = useExpenses()
@@ -65,12 +67,16 @@ export default function Home() {
                         <button 
                             type="button"
                             className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
-                            onClick={()=>router.goLogin}
+                            onClick={()=>router.goLogin()}
                         >
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                             </svg>
-
+                            {session?.user && (
+                                <span className="text-white font-medium">
+                                {session.user.name}
+                                </span>
+                            )}
                         </button>
                     </div>
                 </div>
