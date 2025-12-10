@@ -32,8 +32,9 @@ export default function LoginForm() {
     }
 
     return (
-    <form className="space-y-5" onKeyDown={handleKeyDown}>
-      <div className="relative group">
+    <form className="flex flex-col items-center gap-5 w-[90%] max-w-lg" onKeyDown={handleKeyDown}>
+      <h1 className="text-emerald-600 font-bold text-4xl mb-6 tracking-wide">Login</h1>
+      <div className="relative group w-full">
         <MdEmail className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
         <input 
           type="email"
@@ -44,7 +45,7 @@ export default function LoginForm() {
         />
       </div>
 
-      <div className="relative group">
+      <div className="relative group w-full">
         <MdLock className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
 
         <input
@@ -65,7 +66,7 @@ export default function LoginForm() {
       <button
       type="button"
         onClick={handleLogin}
-        className="cursor-pointer w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group"
+        className="mt-5 cursor-pointer w-[60%] max-w-sm bg-linear-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group"
       >
         Entrar
         <MdArrowForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

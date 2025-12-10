@@ -6,6 +6,7 @@ import { doc, setDoc } from "firebase/firestore"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import {useAppRouter} from "@/utils/useAppRouter"
+import { MdArrowForward, MdEmail, MdLock, MdPerson } from "react-icons/md"
 
 export default function RegisterForm() {
     const router = useAppRouter()
@@ -54,33 +55,42 @@ export default function RegisterForm() {
     }
  
     return (
-        <form onSubmit={handleRegister} onKeyDown={handleKeyDown} className="bg-white p-6 rounded-lg shadow-md w-80 flex-col">
-            <h1 className="text-2xl mb-4 font-semibold">Crie sua Conta</h1>
-            <input
-                className="border p-2 w-full mb-3"
-                placeholder="Seu nome"
-                value={name}
-                onChange={(e)=>setName(e.target.value)}
-            />
-            <input
-                className="border p-2 w-full mb-3"
-                placeholder="Email"
-                value={email}
-                onChange={(e)=> setEmail(e.target.value)}
-            />
-            <input
-                type="password"
-                className="border p-2 w-full mb-3"
-                placeholder="Senha"
-                value={password}
-                onChange={(e)=>setPassword(e.target.value)}
-            />
-
+        <form onSubmit={handleRegister} onKeyDown={handleKeyDown} className="flex flex-col items-center gap-5 w-[90%] max-w-lg">
+            <h1 className="text-emerald-600 font-bold text-4xl mb-6 tracking-wide">Crie sua Conta</h1>
+            <div className="relative group w-full">
+                <MdPerson className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+                <input
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+                    placeholder="Seu nome"
+                    value={name}
+                    onChange={(e)=>setName(e.target.value)}
+                />
+            </div>
+            <div className="relative group w-full">
+                <MdEmail className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+                <input
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e)=> setEmail(e.target.value)}
+                />
+            </div>
+            <div className="relative group w-full">
+                <MdLock className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+                <input
+                    type="password"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+                    placeholder="Senha"
+                    value={password}
+                    onChange={(e)=>setPassword(e.target.value)}
+                />
+            </div>
             {error && <span className="text-red-500">{error}</span>}
             {success && <span className="text-green-600">{success}</span>}
 
-            <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full p-2 rounded">
+            <button type="submit" className="mt-5 cursor-pointer w-[60%] max-w-sm bg-linear-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group">
                 Criar
+                <MdArrowForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
         </form>
     )

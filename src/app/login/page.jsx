@@ -4,6 +4,7 @@ import {signOut, useSession} from "next-auth/react"
 import { useState } from "react"
 import LoginForm from "@/components/LoginForm"
 import RegisterForm from "@/components/RegisterForm"
+import Image from "next/image"
 
 
 export default function LoginPage() {
@@ -37,21 +38,27 @@ export default function LoginPage() {
         )
     } else {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+            <div className="min-h-screen flex items-center bg-gray-100">
 
-
-                {mode === "login" ? <LoginForm/> : <RegisterForm/>}
-
-                <button
-                    type="button"
-                    className="mt-4 text-blue-600 text-sm w-full cursor-pointer"
-                    onClick={()=>setMode(mode==="login" ? "register" : "login")}
-                >
-                    {mode === "login"
-                        ? "Não tem conta? Criar conta"
-                        : "Já tem conta? Entrar" 
-                    }
-                </button>
+          
+                    <div className="relative w-full min-h-screen">
+                        <Image src={'/img/bglogin2.png'} alt="background" fill priority className=" object-cover bg-cover bg-center"/>
+                    </div>
+                    <div className="w-1/2 flex flex-col rounded-l-2xl items-center justify-center border min-h-screen
+                    border-transparent bg-white overflow-hidden ">
+                        {mode === "login" ? <LoginForm/> : <RegisterForm/>}
+                        <button
+                            type="button"
+                            className="mt-4 text-gray-400 text-sm cursor-pointer  hover:scale-[1.02] transition-all" 
+                            onClick={()=>setMode(mode==="login" ? "register" : "login")}
+                        >
+                            {mode === "login"
+                                ? "Não tem conta? Criar conta"
+                                : "Já tem conta? Entrar"
+                            }
+                        </button>
+                    </div>
+           
 
             </div>
         )
