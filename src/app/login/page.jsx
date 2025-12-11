@@ -41,8 +41,8 @@ export default function LoginPage() {
             <div className="min-h-screen flex items-center ">
 
           
-                    <div className="relative w-full min-h-screen">
-                        <Image src={'/img/bglogin2.png'} alt="background" fill priority className=" object-cover bg-cover bg-center"/>
+                    <div className="relative w-1/2 min-h-screen">
+                        <Image src={'/img/bglog.png'} alt="background" fill priority className=" object-cover bg-cover bg-center"/>
                     </div>
                     <div className="w-1/2 flex flex-col rounded-l-2xl items-center justify-center border min-h-screen border-transparent bg-gray-100 overflow-hidden ">
                         {mode === "login" ? <LoginForm/> : <RegisterForm/>}

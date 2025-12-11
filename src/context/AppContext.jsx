@@ -36,8 +36,16 @@ export function AppProvider({children}) {
     }
 
     async function removeExpense(id){
-        if (!session?.user?.id) return;
-        await deleteDoc(doc(db, "users", session.user.id, "expenses", id))
+        try {
+            if (!session?.user?.id) {
+                console.error("ID do usuário ausente:", session?.user)
+                return
+            }
+            await deleteDoc(doc(db, "users", session.user.id, "expenses", id))
+            console.log("Deletado:", id)
+        } catch (err) {
+            console.error("Erro ao deletar:", err)
+        }
     }
 
     return (
