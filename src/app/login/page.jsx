@@ -38,14 +38,13 @@ export default function LoginPage() {
         )
     } else {
         return (
-            <div className="min-h-screen flex items-center bg-gray-100">
+            <div className="min-h-screen flex items-center ">
 
           
                     <div className="relative w-full min-h-screen">
                         <Image src={'/img/bglogin2.png'} alt="background" fill priority className=" object-cover bg-cover bg-center"/>
                     </div>
-                    <div className="w-1/2 flex flex-col rounded-l-2xl items-center justify-center border min-h-screen
-                    border-transparent bg-white overflow-hidden ">
+                    <div className="w-1/2 flex flex-col rounded-l-2xl items-center justify-center border min-h-screen border-transparent bg-gray-100 overflow-hidden ">
                         {mode === "login" ? <LoginForm/> : <RegisterForm/>}
                         <button
                             type="button"
