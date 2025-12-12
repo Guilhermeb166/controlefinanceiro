@@ -20,7 +20,6 @@ export default function Model({ isOpen,setIsOpen }) {
         const data = new Date().toLocaleDateString()
         
         addExpense({
-            id: crypto.randomUUID(),
             descricao,
             valor: Number(valor),
             tipo,
