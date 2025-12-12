@@ -113,11 +113,8 @@ export async function extractFromImage(file, callback) {
 
 
     callback({
-      id: crypto.randomUUID(),
       descricao,
       valor,
-      tipo,
-      tipoDetalhado,
       data,
     });
 

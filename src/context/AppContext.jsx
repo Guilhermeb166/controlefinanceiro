@@ -9,7 +9,7 @@ const AppContext = createContext()
 
 export function AppProvider({children}) {
     const { data: session } = useSession();
-    const [expenses, setExpenses] = useState([])
+    const [expenses, setExpenses] = useState(null)
 
     useEffect (()=>{
         if (!session?.user?.id) return
@@ -26,7 +26,9 @@ export function AppProvider({children}) {
 
     async function addExpense(data) {
         if  (!session?.user?.id){
+            alert("Usuário não autenticado")
             throw new Error("Usuário não autenticado")
+            
         }
         await addDoc(collection(db, "users", session.user.id, "expenses"),
         {

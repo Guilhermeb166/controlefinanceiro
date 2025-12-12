@@ -15,7 +15,7 @@ export default function Home() {
     const [isOpen, setIsOpen] = useState(false)
     const { expenses } = useExpenses()
 
-    const summary = expenses.reduce((acc, item)=>{
+    const summary = (expenses ?? []).reduce((acc, item) => {
         if (item.tipo === 'Receita') {
             acc.entradas += item.valor
             acc.total += item.valor
@@ -23,7 +23,6 @@ export default function Home() {
             acc.saidas -= item.valor
             acc.total -= item.valor
         }
-
         return acc
     }, {
         entradas: 0,

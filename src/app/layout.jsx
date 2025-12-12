@@ -1,3 +1,4 @@
+import AuthLoader from "@/components/AuthLoader";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -14,7 +15,9 @@ export default function RootLayout({ children }) {
         className={`antialiased`}
       >
         <Providers>
-          {children}
+          <AuthLoader>
+            {children}
+          </AuthLoader>  
         </Providers>
       </body>
     </html>

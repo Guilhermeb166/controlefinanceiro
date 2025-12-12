@@ -14,8 +14,8 @@ export default function LoginPage() {
 
     if (session?.user) {
         return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-            <div className="bg-white p-6 rounded shadow-md w-80 text-center">
+        <div className=" min-h-screen flex flex-col items-center justify-center bg-gray-100">
+            <div className="bg-white p-6 rounded-lg shadow-md w-80 text-center">
 
             <h1 className="text-2xl font-semibold mb-3">Você já está logado</h1>
 
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
             <button
                 type="button"
-                className="bg-red-600 text-white w-full p-2 rounded hover:bg-red-700"
+                className="cursor-pointer bg-red-600 text-white w-full p-2 rounded hover:bg-red-700"
                 onClick={() => signOut({ callbackUrl: "/" })}
             >
                 Sair
