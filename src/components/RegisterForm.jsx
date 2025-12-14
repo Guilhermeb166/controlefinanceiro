@@ -7,8 +7,11 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import {useAppRouter} from "@/utils/useAppRouter"
 import { MdArrowForward, MdEmail, MdLock, MdPerson } from "react-icons/md"
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { usePasswordToggle } from "@/utils/usePasswordToggle";
 
 export default function RegisterForm() {
+    const { showPassword, togglePassword, inputType } = usePasswordToggle()
     const router = useAppRouter()
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
@@ -75,15 +78,16 @@ export default function RegisterForm() {
                     onChange={(e)=> setEmail(e.target.value)}
                 />
             </div>
-            <div className="relative group w-full">
+            <div className="relative group w-full flex items-center">
                 <MdLock className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
                 <input
-                    type="password"
+                    type={inputType }
                     className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
                     placeholder="Senha"
                     value={password}
                     onChange={(e)=>setPassword(e.target.value)}
                 />
+                {showPassword ? <FaEye onClick={togglePassword} className="absolute right-4 text-gray-400 cursor-pointer text-xl"/> : <FaEyeSlash onClick={togglePassword} className="absolute right-4 text-gray-400 cursor-pointer text-xl"/> }
             </div>
             {error && <span className="text-red-500">{error}</span>}
             {success && <span className="text-green-600">{success}</span>}
