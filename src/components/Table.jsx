@@ -1,11 +1,12 @@
 import { FaTrash } from "react-icons/fa"
-import { useExpenses } from '@/context/AppContext'
+
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { useState, useEffect } from "react"
+import { useExpenses } from "@/context/AppContext"
 
-export default function Table() {
+export default function Table({ expenses }) {
+    const { removeExpense } = useExpenses()
 
-    const { expenses, removeExpense } = useExpenses()
     const [ openPopup, setOpenPopup] = useState(false)
     const [ selected, setSelected ] = useState(null)
 

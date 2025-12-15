@@ -1,0 +1,92 @@
+"use client"
+
+import { useState } from "react"
+import { CiFilter } from "react-icons/ci"
+import FilterControl from "./FilterControl"
+import SortControl from "./SortControl"
+
+
+export default function ExpensesControls({
+    sortBy,
+    setSortBy,
+    filters,
+    setFilters,
+    onApplyFilters
+}) {
+
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+    function handleApply() {
+        onApplyFilters()
+        setIsFilterOpen(false)
+    }
+
+    function countActiveFilters(filters) {
+        return Object.values(filters).filter(value => value !== "all").length
+    }
+
+    const activeFiltersCount = countActiveFilters(filters)
+
+    return (
+        <>
+            <div className="flex flex-wrap gap-4 items-center  mt-6">
+                <SortControl sortBy={sortBy} setSortBy={setSortBy}/>
+                <button
+                    type="button"
+                    onClick={()=>setIsFilterOpen(true)}
+                    className="relative bg-white cursor-pointer flex items-center gap-2 px-3 py-[9px] rounded border border-gray-300 hover:bg-gray-100"
+                >
+                    <CiFilter size={20}/>
+                    {activeFiltersCount > 0 && (
+                        <span
+                            className="
+                                absolute -top-1 -right-1
+                                flex items-center justify-center
+                                h-5 min-w-5 px-1
+                                rounded-full
+                                bg-red-600
+                                text-white
+                                text-xs
+                                font-semibold
+                            "
+                        >
+                            {activeFiltersCount}
+                        </span>
+                    )}
+                </button>
+            </div>
+            { isFilterOpen && (
+                <button
+                    type="button"
+                    aria-label="Fechar filtros"
+                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setIsFilterOpen(false)
+                        }
+                    }}
+                >
+                <div
+                    className="bg-white py-4 px-6 rounded-lg shadow-lg w-[400px] border-none"
+                    role="dialog"
+                    aria-modal="true"
+                >
+            <FilterControl
+              filters={filters}
+              setFilters={setFilters}
+              onApplyFilters={handleApply}
+            />
+
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(false)}
+              className="cursor-pointer  mt-3 w-full text-sm text-gray-500 hover:underline"
+            >
+              Cancelar
+            </button>
+          </div>
+        </button>
+      )}
+    </>
+  )
+}

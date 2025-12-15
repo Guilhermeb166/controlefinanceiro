@@ -1,35 +1,113 @@
 'use client'
 
-import { useState } from "react";
+import { useSession } from "next-auth/react"
+import { useState, useMemo  } from "react";
 import ImportExtract from "@/components/ImportExtract";
 import Model from "@/components/Model";
 import Table from "@/components/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
 import {useAppRouter} from "@/utils/useAppRouter"
-import { useSession } from "next-auth/react"
+import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 
 export default function Home() {
     const { data: session } = useSession()
-    const router = useAppRouter()
-    const [isOpen, setIsOpen] = useState(false)
     const { expenses } = useExpenses()
+    const router = useAppRouter()
 
-    const summary = (expenses ?? []).reduce((acc, item) => {
-        if (item.tipo === 'Receita') {
-            acc.entradas += item.valor
-            acc.total += item.valor
-        } else {
-            acc.saidas -= item.valor
-            acc.total -= item.valor
-        }
-        return acc
-    }, {
-        entradas: 0,
-        saidas: 0,
-        total: 0
+    const [isOpen, setIsOpen] = useState(false)
+    const [sortBy, setSortBy] = useState("date-desc")
+    const [filters, setFilters] = useState({
+        tipo:"all",
+        month:"all",
+        year:"all"
     })
+    const [appliedFilters, setAppliedFilters] = useState(filters)
+    
 
+     function applyFilters() {
+        setAppliedFilters(filters)
+    }
+
+    const summary = useMemo(() => {
+        return (expenses ?? []).reduce(
+            (acc, item) => {
+                if (item.tipo === "Receita") {
+                acc.entradas += item.valor
+                acc.total += item.valor
+                } else {
+                acc.saidas += item.valor
+                acc.total -= item.valor
+                }
+                return acc
+            },
+            { entradas: 0, saidas: 0, total: 0 }
+            )
+    }, [expenses])
+
+
+    const filteredExpenses = useMemo(() => {
+        let data = [...(expenses ?? [])]
+
+        if (appliedFilters.tipo !== "all") {
+            if (appliedFilters.tipo === "Despesa") {
+                data = data.filter(e =>
+                e.tipo === "Crédito" ||
+                e.tipo === "Débito/Pix"
+                )
+            } else {
+                data = data.filter(e => e.tipo === appliedFilters.tipo)
+            }
+        }
+
+    if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
+      data = data.filter(e => {
+        const [_, month, year] = e.data.split("/")
+
+        if (
+          appliedFilters.month !== "all" &&
+          Number(month) !== Number(appliedFilters.month)
+        ) {
+          return false
+        }
+
+        if (
+          appliedFilters.year !== "all" &&
+          Number(year) !== Number(appliedFilters.year)
+        ) {
+          return false
+        }
+
+        return true
+      })
+    }
+
+
+    switch (sortBy) {
+      case "value-desc":
+        data.sort((a, b) => b.valor - a.valor)
+        break
+      case "value-asc":
+        data.sort((a, b) => a.valor - b.valor)
+        break
+      case "date-asc":
+        data.sort(
+          (a, b) =>
+            new Date(a.data.split("/").reverse().join("-")) -
+            new Date(b.data.split("/").reverse().join("-"))
+        )
+        break
+      case "date-desc":
+      default:
+        data.sort(
+          (a, b) =>
+            new Date(b.data.split("/").reverse().join("-")) -
+            new Date(a.data.split("/").reverse().join("-"))
+        )
+    }
+
+    return data
+  }, [expenses, sortBy, appliedFilters])
     return (
         <main className="min-h-screen bg-neutral-200">
             <Model
@@ -110,7 +188,14 @@ export default function Home() {
                         <h1 className="text-white text-3xl font-semibold">{formatCurrency(summary.total)}</h1>
                     </div>
                 </div>
-                <Table/>
+                <ExpensesControls
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    filters={filters}
+                    setFilters={setFilters}
+                    onApplyFilters={applyFilters}
+                />
+                <Table expenses={filteredExpenses}/>
             </section>
         </main>
     );
