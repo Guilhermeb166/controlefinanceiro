@@ -50,6 +50,10 @@ export default function ImportExtract() {
         if (fileInputRef.current) fileInputRef.current.value = ""
     }
 
+    function isSelected(type) {
+        return selectedType === type
+    }
+
     return (
         <div>
             <label className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5">
@@ -79,41 +83,67 @@ export default function ImportExtract() {
             </label>
             {step === "chooseType" && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white p-4 rounded-lg shadow-lg w-80">
+                    <div className="bg-white p-4 rounded-lg shadow-lg w-100">
                         <h2 className="text-lg font-semibold mb-4">Selecione o tipo de transação</h2>
 
                         <div className="flex flex-col gap-3">
                             <button
                                 type="button"
-                                className="cursor-pointer px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
-                                onClick={() => { setSelectedType("Receita"); processExtract(); }}
+                                className={`cursor-pointer px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700
+                                    ${isSelected("Receita")
+                                    ? "border-emerald-900 ring-2 ring-emerald-800 "
+                                    : "border-gray-300 "}`}
+                                onClick={() => setSelectedType("Receita")}
                             >
                                 Receita
                             </button>
 
-                            <button
-                                type="button"
-                                className= "cursor-pointer px-4 py-2 rounded bg-blue-700 text-white hover:bg-blue-800"
-                                onClick={() => { setSelectedType("Despesa Crédito"); processExtract(); }}
-                            >
-                                Despesa no Crédito
-                            </button>
-
-                            <button
-                                type="button"
-                                className="cursor-pointer px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                                onClick={() => { setSelectedType("Despesa Débito/Pix"); processExtract(); }}
-                            >
-                                Despesa Débito / Pix
-                            </button>
-
-                            <button
-                                type="button"
-                                className="cursor-pointer mt-5 px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-                                onClick={cancel}
-                            >
-                                Cancelar
-                            </button>
+                            <div className="flex items-center justify-between w-full gap-3">
+                                <button
+                                    type="button"
+                                    className= {`w-full cursor-pointer px-2 py-2 rounded bg-red-600 text-white hover:bg-red-700
+                                     ${isSelected("Despesa Crédito")
+                                        ? "border-red-800 ring-2 ring-red-800 "
+                                        : "border-gray-300 "}
+                                    `}
+                                    onClick={() => setSelectedType("Despesa Crédito")}
+                                >
+                                    Despesa no Crédito
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`w-full cursor-pointer px-2 py-2 rounded bg-red-600 text-white hover:bg-red-700
+                                        ${isSelected("Despesa Débito/Pix")
+                                            ? "border-red-800 ring-2 ring-red-800 "
+                                            : "border-gray-300 "}
+                                        `}
+                                    onClick={() => setSelectedType("Despesa Débito/Pix")}
+                                >
+                                    Despesa Débito / Pix
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-between w-full gap-3 mt-5">
+                                <button
+                                    type="button"
+                                    disabled={!selectedType}
+                                    onClick={processExtract}
+                                    className={`
+                                         px-4 py-2 rounded text-white w-full
+                                        ${selectedType
+                                        ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                                        : "bg-gray-300 cursor-not-allowed"}
+                                    `}
+                                    >
+                                    Pronto
+                                </button>
+                                <button
+                                    type="button"
+                                    className="w-full cursor-pointer px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                                    onClick={cancel}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
