@@ -29,18 +29,9 @@ export async function extractFromImage(file, callback) {
       const [, diaRaw, mesTxt, ano] = matchMesTxt;
       const dia = diaRaw.padStart(2, "0");
       const meses = {
-        JAN: "01",
-        FEV: "02",
-        MAR: "03",
-        ABR: "04",
-        MAI: "05",
-        JUN: "06",
-        JUL: "07",
-        AGO: "08",
-        SET: "09",
-        OUT: "10",
-        NOV: "11",
-        DEZ: "12",
+        JAN: "01", FEV: "02", MAR: "03", ABR: "04",
+        MAI: "05", JUN: "06", JUL: "07", AGO: "08",
+        SET: "09", OUT: "10", NOV: "11", DEZ: "12",
       };
       const mes = meses[mesTxt.toUpperCase()] || "01";
       data = `${dia}/${mes}/${ano}`;
@@ -90,30 +81,10 @@ export async function extractFromImage(file, callback) {
     }
 
 
-    let descricao = "Transferência";
-
-
-    const destinoRegex = /Destino[\s\S]*?Nome\s+([A-Za-zÀ-ÿ0-9\.\-\s]+)/i;
-    const destinoMatch = texto.match(destinoRegex);
-    if (destinoMatch) {
-      descricao = `PIX enviado para ${destinoMatch[1].trim()}`;
-    } else {
-
-      const nomeRegex = /Nome\s+([A-Za-zÀ-ÿ0-9\.\-\s]{3,})/i;
-      const nomeMatch = texto.match(nomeRegex);
-      if (nomeMatch) {
-        descricao = `Transferência - ${nomeMatch[1].trim()}`;
-      }
-    }
-
-
-    const isPix = /pix/i.test(texto);
-    const tipo = "Despesa";
-    const tipoDetalhado = isPix ? "Débito/Pix" : "Débito";
+   
 
 
     callback({
-      descricao,
       valor,
       data,
     });

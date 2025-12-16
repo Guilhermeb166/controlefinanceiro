@@ -10,6 +10,7 @@ export default function ImportExtract() {
     const [step, setStep] = useState("inactive")
     const [file, setFile] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
+    const [descricao, setDescricao] = useState("")
     const fileInputRef = useRef(null)
 
     async function handleImageUpload(e) {
@@ -30,6 +31,7 @@ export default function ImportExtract() {
         await extractFromImage(file, (transacao)=>
             addExpense({
                 ...transacao,
+                descricao: descricao || "Sem descrição",
                 tipo: selectedType
             })
         )
@@ -38,6 +40,7 @@ export default function ImportExtract() {
         setStep("idle")
         setFile(null)
         setSelectedType(null)
+        setDescricao("")
         if (fileInputRef.current) fileInputRef.current.value = ""
         alert("Transações importadas com sucesso!")
     }
@@ -46,6 +49,7 @@ export default function ImportExtract() {
         setStep("idle")
         setFile(null)
         setSelectedType(null)
+        setDescricao("")
 
         if (fileInputRef.current) fileInputRef.current.value = ""
     }
@@ -85,7 +89,13 @@ export default function ImportExtract() {
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white p-4 rounded-lg shadow-lg w-100">
                         <h2 className="text-lg font-semibold mb-4">Selecione o tipo de transação</h2>
-
+                        <input
+                            type="text"
+                            placeholder="Descrição (ex: Mercado, Uber, Almoço)"
+                            value={descricao}
+                            onChange={(e) => setDescricao(e.target.value)}
+                            className="w-full mb-4 px-3 py-2 border border-gray-300 hover:border-gray-400 rounded-md outline-none focus:border-gray-400 shadow-md"
+                        />
                         <div className="flex flex-col gap-3">
                             <button
                                 type="button"
