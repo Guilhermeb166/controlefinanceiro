@@ -1,18 +1,37 @@
 "use client"
 
-import {signOut, useSession} from "next-auth/react"
-import { useState } from "react"
-import LoginForm from "@/components/LoginForm"
-import RegisterForm from "@/components/RegisterForm"
+import { useEffect, useState } from "react"
+import { signOut, onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/backend/firebase"
+
+import LoginForm from "@/components/Login/LoginForm"
+import RegisterForm from "@/components/Login/RegisterForm"
 import Image from "next/image"
 
 
 export default function LoginPage() {
 
     const [mode, setMode] = useState("login")
-    const { data: session } = useSession()
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
 
-    if (session?.user) {
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (u) => {
+            setUser(u)
+            setLoading(false)
+        })
+        return () => unsub()
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                Carregando...
+            </div>
+        )
+    }
+
+    if (user) {
         return (
         <div className=" min-h-screen flex flex-col items-center justify-center bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-md w-80 text-center">
@@ -20,16 +39,19 @@ export default function LoginPage() {
             <h1 className="text-2xl font-semibold mb-3">Você já está logado</h1>
 
             <p className="text-gray-700 font-medium">
-                {session.user.name || "Sem nome"}
+                {user.displayName || "Sem nome"}
             </p>
             <p className="text-gray-500 mb-4">
-                {session.user.email}
+                {user.email}
             </p>
 
             <button
                 type="button"
                 className="cursor-pointer bg-red-600 text-white w-full p-2 rounded hover:bg-red-700"
-                onClick={() => signOut({ callbackUrl: "/" })}
+                 onClick={async () => {
+                    await signOut(auth)
+                    window.location.href = "/"
+                }}
             >
                 Sair
             </button>

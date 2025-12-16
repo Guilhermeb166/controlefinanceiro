@@ -1,53 +1,48 @@
 /** biome-ignore-all assist/source/organizeImports: <> */
 "use client"
-import { addDoc, collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { useSession } from "next-auth/react";
-import { db } from "@/backend/firebase";
 import { createContext, useContext, useEffect, useState } from "react"
+import { auth, db } from "@/backend/firebase"
+import { onAuthStateChanged } from "firebase/auth"
+import { addDoc, collection, deleteDoc, doc, onSnapshot } from "firebase/firestore"
 
 const AppContext = createContext()
 
 export function AppProvider({children}) {
-    const { data: session } = useSession();
+    const [user, setUser] = useState(null)
     const [expenses, setExpenses] = useState(null)
 
-    useEffect (()=>{
-        if (!session?.user?.id) return
-
-        const q = collection (db, "users", session.user.id, "expenses")
-
-        const unsub = onSnapshot(q, snap => {
-            setExpenses(
-                snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-            )
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+        setUser(firebaseUser)
         })
-        return ()=> unsub()
-    }, [session])
+        return () => unsub()
+    }, [])
+
+    useEffect(() => {
+        if (!user?.uid) return
+
+        const q = collection(db, "users", user.uid, "expenses")
+
+        const unsub = onSnapshot(q, (snap) => {
+        setExpenses(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        })
+
+        return () => unsub()
+    }, [user])
 
     async function addExpense(data) {
-        if  (!session?.user?.id){
-            alert("Usuário não autenticado")
-            throw new Error("Usuário não autenticado")
-            
-        }
-        await addDoc(collection(db, "users", session.user.id, "expenses"),
-        {
-            ...data,
-            createdAt: new Date(),
+        if (!user?.uid) throw new Error("Usuário não autenticado")
+
+        await addDoc(collection(db, "users", user.uid, "expenses"), {
+        ...data,
+        createdAt: new Date(),
         })
     }
 
-    async function removeExpense(id){
-        try {
-            if (!session?.user?.id) {
-                console.error("ID do usuário ausente:", session?.user)
-                return
-            }
-            await deleteDoc(doc(db, "users", session.user.id, "expenses", id))
-            console.log("Deletado:", id)
-        } catch (err) {
-            console.error("Erro ao deletar:", err)
-        }
+    async function removeExpense(id) {
+        if (!user?.uid) return
+
+        await deleteDoc(doc(db, "users", user.uid, "expenses", id))
     }
 
     return (
@@ -58,9 +53,7 @@ export function AppProvider({children}) {
 }
 
 export function useExpenses() {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useExpenses deve ser usado dentro de AppProvider");
-  }
-  return context;
+    const ctx = useContext(AppContext)
+    if (!ctx) throw new Error("useExpenses deve estar dentro do AppProvider")
+    return ctx
 }

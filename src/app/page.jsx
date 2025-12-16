@@ -1,7 +1,8 @@
 'use client'
 
-import { useSession } from "next-auth/react"
-import { useState, useMemo  } from "react";
+import { onAuthStateChanged } from "firebase/auth"
+import { useEffect, useState, useMemo   } from "react";
+import { auth } from "@/backend/firebase"
 import ImportExtract from "@/components/ImportExtract";
 import Model from "@/components/Model";
 import Table from "@/components/Table";
@@ -11,7 +12,7 @@ import {useAppRouter} from "@/utils/useAppRouter"
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 
 export default function Home() {
-    const { data: session } = useSession()
+    const [user, setUser] = useState(null)
     const { expenses } = useExpenses()
     const router = useAppRouter()
 
@@ -84,30 +85,39 @@ export default function Home() {
 
 
     switch (sortBy) {
-      case "value-desc":
-        data.sort((a, b) => b.valor - a.valor)
-        break
-      case "value-asc":
-        data.sort((a, b) => a.valor - b.valor)
-        break
-      case "date-asc":
-        data.sort(
-          (a, b) =>
-            new Date(a.data.split("/").reverse().join("-")) -
-            new Date(b.data.split("/").reverse().join("-"))
-        )
-        break
-      case "date-desc":
-      default:
-        data.sort(
-          (a, b) =>
-            new Date(b.data.split("/").reverse().join("-")) -
-            new Date(a.data.split("/").reverse().join("-"))
-        )
-    }
+        case "value-desc":
+            data.sort((a, b) => b.valor - a.valor)
+            break
+        case "value-asc":
+            data.sort((a, b) => a.valor - b.valor)
+            break
+        case "date-asc":
+            data.sort(
+            (a, b) =>
+                new Date(a.data.split("/").reverse().join("-")) -
+                new Date(b.data.split("/").reverse().join("-"))
+            )
+            break
+        case "date-desc":
+        default:
+            data.sort(
+            (a, b) =>
+                new Date(b.data.split("/").reverse().join("-")) -
+                new Date(a.data.split("/").reverse().join("-"))
+            )
+        }
 
-    return data
-  }, [expenses, sortBy, appliedFilters])
+        return data
+    }, [expenses, sortBy, appliedFilters])
+  
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+            setUser(firebaseUser)
+        })
+
+        return () => unsub()
+    }, [])
+
     return (
         <main className="min-h-screen bg-neutral-200">
             <Model
@@ -149,9 +159,9 @@ export default function Home() {
                             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                             </svg>
-                            {session?.user && (
+                            {user && (
                                 <span className="text-white font-medium">
-                                {session.user.name}
+                                {user.displayName}
                                 </span>
                             )}
                         </button>

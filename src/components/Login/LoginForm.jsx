@@ -1,9 +1,11 @@
 "use client"
 import { useState } from "react"
-import { signIn } from "next-auth/react"
-import { MdEmail, MdLock, MdPerson, MdLogout, MdArrowForward } from "react-icons/md"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/backend/firebase"
+import { MdEmail, MdLock, MdArrowForward } from "react-icons/md"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { usePasswordToggle } from "@/utils/usePasswordToggle";
+import {useAppRouter} from "@/utils/useAppRouter"
 
 export default function LoginForm() {
 
@@ -11,21 +13,21 @@ export default function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
+    const router = useAppRouter()
 
     async function handleLogin(e) {
         e.preventDefault()
         setError("")
 
-        const res = await signIn("credentials", {
-            email,
-            password,
-            redirect: true,
-            callbackUrl: "/",
-        })
-        
-        if (res?.error) setError(" Login inválido")
-
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+            router.goHome()
+        } catch (err) {
+            console.error(err)
+            setError("Email ou senha inválidos")
+        }
     }
+
 
     function handleKeyDown(e) {
         if (e.key === "Enter") {

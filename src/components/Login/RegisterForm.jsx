@@ -3,12 +3,13 @@
 // biome-ignore assist/source/organizeImports: <>
 import { auth, db } from "@/backend/firebase"
 import { doc, setDoc } from "firebase/firestore"
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import {useAppRouter} from "@/utils/useAppRouter"
 import { MdArrowForward, MdEmail, MdLock, MdPerson } from "react-icons/md"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { usePasswordToggle } from "@/utils/usePasswordToggle";
+
 
 export default function RegisterForm() {
     const { showPassword, togglePassword, inputType } = usePasswordToggle()
@@ -43,8 +44,13 @@ export default function RegisterForm() {
                 createdAt: new Date(),
             })
 
-            setSuccess("Conta criada! Agora faça login.")
-            router.goHome()
+            setSuccess("Conta criada!")
+             onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    router.goHome()
+                }
+            })
+
         } catch (err) {
             console.error(err)
             setError("Erro ao criar conta: ")
