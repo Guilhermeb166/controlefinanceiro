@@ -5,13 +5,15 @@ import { CiFilter } from "react-icons/ci"
 import FilterControl from "./FilterControl"
 import SortControl from "./SortControl"
 import { LuFileSpreadsheet } from "react-icons/lu";
+import { exportExpensesToExcel } from "@/utils/exportExpensesToExcel"
 
 export default function ExpensesControls({
     sortBy,
     setSortBy,
     filters,
     setFilters,
-    onApplyFilters
+    onApplyFilters,
+    expenses 
 }) {
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -56,6 +58,7 @@ export default function ExpensesControls({
                 </button>
                 <button
                     type="button"
+                    onClick={()=> exportExpensesToExcel(expenses)}
                     className="relative bg-white cursor-pointer flex items-center gap-2 px-3 py-[9px] rounded border border-gray-300 hover:bg-gray-100"
                 >
                     <LuFileSpreadsheet size={20}/>

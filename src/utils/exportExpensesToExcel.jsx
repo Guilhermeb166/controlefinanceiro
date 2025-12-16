@@ -11,7 +11,33 @@ export async function exportExpensesToExcel(expenses) {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet("Despesas")
 
-    return (
-        <div>exportExpensesToExcel</div>
-    )
+    worksheet.columns = [
+        { header: "Data", key: "data", width: 14},
+        { header: "Descrição", key: "descricao", width: 32 },
+        { header: "Valor", key:"valor", width: 16 },
+        { header: "Tipo", key:"tipo", width: 22 },
+    ]
+
+    worksheet.getRow(1).font = {bold: true}
+    worksheet.getRow(1).alignment = {vertical: "middle"}
+
+    expenses.forEach(item => {
+        worksheet.addRow({
+            data: item.data,
+            descricao: item.descricao,
+            valor: Number(item.valor),
+            tipo: item.tipo,
+        })
+    })
+
+    worksheet.getColumn("valor").numFmt = '"R$"#,##0.00;[Red]-"R$"#,##0.00'
+
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    const blob = new Blob([buffer], {
+        type:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+
+    saveAs(blob, "controleFinanceiro.xlsx")
 }

@@ -194,6 +194,7 @@ export default function Home() {
                     filters={filters}
                     setFilters={setFilters}
                     onApplyFilters={applyFilters}
+                    expenses={filteredExpenses}
                 />
                 <Table expenses={filteredExpenses}/>
             </section>
