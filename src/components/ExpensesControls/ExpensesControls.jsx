@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CiFilter } from "react-icons/ci"
 import FilterControl from "./FilterControl"
 import SortControl from "./SortControl"
-
+import { LuFileSpreadsheet } from "react-icons/lu";
 
 export default function ExpensesControls({
     sortBy,
@@ -53,6 +53,12 @@ export default function ExpensesControls({
                             {activeFiltersCount}
                         </span>
                     )}
+                </button>
+                <button
+                    type="button"
+                    className="relative bg-white cursor-pointer flex items-center gap-2 px-3 py-[9px] rounded border border-gray-300 hover:bg-gray-100"
+                >
+                    <LuFileSpreadsheet size={20}/>
                 </button>
             </div>
             { isFilterOpen && (
