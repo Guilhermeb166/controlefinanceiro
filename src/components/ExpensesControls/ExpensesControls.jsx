@@ -31,38 +31,40 @@ export default function ExpensesControls({
 
     return (
         <>
-            <div className="flex flex-wrap gap-4 items-center  mt-6">
+            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start mt-6">
                 <SortControl sortBy={sortBy} setSortBy={setSortBy}/>
-                <button
-                    type="button"
-                    onClick={()=>setIsFilterOpen(true)}
-                    className="relative bg-white cursor-pointer flex items-center gap-2 px-3 py-[9px] rounded border border-gray-300 hover:bg-gray-100"
-                >
-                    <CiFilter size={20}/>
-                    {activeFiltersCount > 0 && (
-                        <span
-                            className="
-                                absolute -top-1 -right-1
-                                flex items-center justify-center
-                                h-5 min-w-5 px-1
-                                rounded-full
-                                bg-red-600
-                                text-white
-                                text-xs
-                                font-semibold
-                            "
-                        >
-                            {activeFiltersCount}
-                        </span>
-                    )}
-                </button>
-                <button
-                    type="button"
-                    onClick={()=> exportExpensesToExcel(expenses)}
-                    className="relative bg-white cursor-pointer flex items-center gap-2 px-3 py-[9px] rounded border border-gray-300 hover:bg-gray-100"
-                >
-                    <LuFileSpreadsheet size={20}/>
-                </button>
+                <div className="flex items-center gap-5 sm:gap-2">
+                    <button
+                        type="button"
+                        onClick={()=>setIsFilterOpen(true)}
+                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[13px] sm:py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                    >
+                        <CiFilter size={20}/>
+                        {activeFiltersCount > 0 && (
+                            <span
+                                className="
+                                    absolute -top-1 -right-1
+                                    flex items-center justify-center
+                                    h-5 min-w-5 px-1
+                                    rounded-full
+                                    bg-red-600
+                                    text-white
+                                    text-xs
+                                    font-semibold
+                                "
+                            >
+                                {activeFiltersCount}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={()=> exportExpensesToExcel(expenses)}
+                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[13px] sm:py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                    >
+                        <LuFileSpreadsheet size={20}/>
+                    </button>
+                </div>
             </div>
             { isFilterOpen && (
                 <button

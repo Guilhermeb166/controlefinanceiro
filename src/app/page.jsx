@@ -120,15 +120,15 @@ export default function Home() {
     }, [])
 
     return (
-        <main className="min-h-screen bg-neutral-200">
+        <main className="min-h-screen bg-neutral-200 pb-30">
             <Model
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
             <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
-                <div className="max-w-5xl mx-auto flex flex-col md:flex-row lg:flex-wrap items-center gap-8 md:justify-between">
+                <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between">
                     <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
-                    <div className="flex items-start gap-3 flex-wrap flex-col sm:flex-row justify-between ">
+                    <div className="flex items-center gap-3 flex-wrap sm:flex-row justify-center">
                             <ImportExtract />
                             <button
                                 type="button"
