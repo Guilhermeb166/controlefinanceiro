@@ -1,5 +1,4 @@
 import { FaTrash } from "react-icons/fa"
-
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { useState, useEffect } from "react"
 import { useExpenses } from "@/context/AppContext"
@@ -34,8 +33,41 @@ export default function Table({ expenses }) {
 
 
     return (
-        <>
-            <table className="max-w-5xl w-full mt-10 border-separate border-spacing-1 border-spacing-x-0">
+        <>  
+            <div className="flex flex-col gap-3 mt-6 lg:hidden">
+                {(expenses ?? []).map(item => (
+                <div
+                    key={item.id}
+                    className="bg-white rounded-lg shadow p-4 flex flex-col gap-2"
+                >
+                    <div className="flex justify-between text-sm text-gray-500">
+                    <span>{item.data}</span>
+                    <FaTrash
+                        className="text-red-600 cursor-pointer"
+                        onClick={() => askDelete(item)}
+                    />
+                    </div>
+
+                    <h3 className="font-medium">{item.descricao}</h3>
+
+                    <div className="flex justify-between items-center">
+                    <span className="font-semibold">
+                        {formatCurrency(item.valor)}
+                    </span>
+                    <span
+                        className={`text-sm font-medium ${
+                        item.tipo === "Receita"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                    >
+                        {item.tipo}
+                    </span>
+                    </div>
+                </div>
+                ))}
+            </div>
+            <table className="hidden lg:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2">
                 <thead>
                     <tr>
                         <th className="px-3 py-4 text-left tracking-[1px]">Data</th>

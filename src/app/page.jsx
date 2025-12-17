@@ -125,33 +125,33 @@ export default function Home() {
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
-            <section className="h-60 bg-emerald-600 pt-8">
-                <div className="max-w-5xl mx-auto flex justify-between">
-                    <h1 className="text-white text-4xl font-semibold ">Minhas Despesas</h1>
-                    <div className="flex items-center gap-3">
-                        <ImportExtract />
-                        <button
-                        type="button"
-                        className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
-                        onClick={() => setIsOpen(true)}
-                        >
-                        <svg
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="size-6"
-                        >
-                            <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
-                            />
-                        </svg>
-                        Nova Transação
-                        </button>
+            <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
+                <div className="max-w-5xl mx-auto flex flex-col md:flex-row lg:flex-wrap items-center gap-8 md:justify-between">
+                    <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
+                    <div className="flex items-start gap-3 flex-wrap flex-col sm:flex-row justify-between ">
+                            <ImportExtract />
+                            <button
+                                type="button"
+                                className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
+                                onClick={() => setIsOpen(true)}
+                            >
+                            <svg
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="size-6"
+                            >
+                                <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 4.5v15m7.5-7.5h-15"
+                                />
+                            </svg>
+                            Nova Transação
+                            </button>
                         {user ? (
                             <UserDropdown user={user} />
                         ) : (
@@ -185,34 +185,34 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-            <section className="max-w-5xl mx-auto">
-                <div className="max-w-5xl mx-auto flex gap-5 h-[120px] -mt-[60px]">
-                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between">
+            <section className="max-w-5xl mx-auto mt-4 lg:mt-0 px-4 lg:px-0">
+                <div className="max-w-5xl mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
+                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-3xl text-emerald-700 font-semibold">Entradas</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-9 text-emerald-700">
+                            <h3 className="text-2xl sm:text-3xl text-emerald-700 font-semibold">Entradas</h3>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9 text-emerald-700">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-3xl font-semibold">{formatCurrency(summary.entradas)}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.entradas)}</h1>
                     </div>
-                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between">
+                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-3xl text-red-700 font-semibold">Saídas</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-9 text-red-700">
+                            <h3 className="text-2xl sm:text-3xl text-red-700 font-semibold">Saídas</h3>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9 text-red-700">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-3xl font-semibold">{formatCurrency(summary.saidas)}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.saidas)}</h1>
                     </div>
-                    <div className="flex flex-col flex-1 bg-emerald-500 rounded border-gray-300 shadow-md p-3 justify-between">
+                    <div className="flex flex-col flex-1 bg-emerald-500 rounded border-gray-300 shadow-md p-3 justify-between w-full">
                         <div className="flex justify-between items-center text-white">
-                            <h3 className="text-3xl font-semibold">Total</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-9 ">
+                            <h3 className="text-2xl sm:text-3xl font-semibold">Total</h3>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
-                        <h1 className="text-white text-3xl font-semibold">{formatCurrency(summary.total)}</h1>
+                        <h1 className="text-white text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.total)}</h1>
                     </div>
                 </div>
                 <ExpensesControls
