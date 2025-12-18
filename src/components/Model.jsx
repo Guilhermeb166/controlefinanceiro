@@ -36,17 +36,17 @@ export default function Model({ isOpen,setIsOpen }) {
             isOpen={isOpen}
             overlayClassName="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center
             bg-gray-500/40 bg-opacity-80 backdrop-blur-sm"
-            className="w-full max-w-lg bg-white p-6 relative outline-none rounded-xl"
+            className="w-[90%] sm:w-full max-w-[400px] sm:max-w-lg bg-white p-4 sm:p-6 relative outline-none rounded-xl"
         >
             <button type="button"
-                className="absolute right-4 top-4"
+                className="absolute right-2 top-1 sm:right-4 sm:top-4"
                 onClick={()=>setIsOpen(!isOpen)}
             >
                         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 cursor-pointer">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 className="text-3xl mb-4">Criar nova transação</h2>
+            <h2 className="text-2xl sm:text-3xl mb-4">Criar nova transação</h2>
             <label className="flex flex-col mb-2">
                 Descrição
                 <input
@@ -58,7 +58,7 @@ export default function Model({ isOpen,setIsOpen }) {
                 />
             </label>
             <p>Tipo</p>
-            <div className="flex gap-4 mt-1 justify-between">
+            <div className="flex gap-2 sm:gap-4 mt-1 justify-between">
                 <button
                 type="button"
                 className={`flex-1 p-3 rounded bg-emerald-600 text-white cursor-pointer max-w-[50%] w-full hover:bg-emerald-800 transition-all duration-300

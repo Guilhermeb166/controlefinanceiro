@@ -78,24 +78,24 @@ export default function ExpensesControls({
                     }}
                 >
                 <div
-                    className="bg-white py-4 px-6 rounded-lg shadow-lg w-[400px] border-none"
+                    className="bg-white py-4 px-6 rounded-lg shadow-lg w-[90%] sm:w-full max-w-md border-none"
                     role="dialog"
                     aria-modal="true"
                 >
-            <FilterControl
-              filters={filters}
-              setFilters={setFilters}
-              onApplyFilters={handleApply}
-            />
+                    <FilterControl
+                        filters={filters}
+                        setFilters={setFilters}
+                        onApplyFilters={handleApply}
+                    />
 
-            <button
-              type="button"
-              onClick={() => setIsFilterOpen(false)}
-              className="cursor-pointer  mt-3 w-full text-sm text-gray-500 hover:underline"
-            >
-              Cancelar
-            </button>
-          </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsFilterOpen(false)}
+                        className="cursor-pointer  mt-3 w-full text-sm text-gray-500 hover:underline"
+                    >
+                        Cancelar
+                    </button>
+                </div>
         </button>
       )}
     </>
