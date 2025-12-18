@@ -47,7 +47,7 @@ export default function LoginForm() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+          className="w-full pl-12 pr-4 py-3.5 bg-white/50 shadow-md backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
         />
       </div>
 
@@ -59,7 +59,7 @@ export default function LoginForm() {
           placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full pl-12 pr-4 py-3.5 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
+          className="w-full pl-12 pr-4 py-3.5 bg-white/50 shadow-md backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all placeholder:text-gray-400"
         />
         {showPassword ? <FaEye onClick={togglePassword} className="absolute right-4 text-gray-400 cursor-pointer text-xl"/> : <FaEyeSlash onClick={togglePassword} className="absolute right-4 text-gray-400 cursor-pointer text-xl"/> }
       </div>
