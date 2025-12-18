@@ -34,7 +34,7 @@ export default function Table({ expenses }) {
 
     return (
         <>  
-            <div className="flex flex-col gap-3 mt-6 lg:hidden">
+            <div className="flex flex-col gap-3 mt-6 md:hidden select-none">
                 {(expenses ?? []).map(item => (
                 <div
                     key={item.id}
@@ -67,7 +67,7 @@ export default function Table({ expenses }) {
                 </div>
                 ))}
             </div>
-            <table className="hidden lg:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2">
+            <table className="hidden md:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2 select-none">
                 <thead>
                     <tr>
                         <th className="px-3 py-4 text-left tracking-[1px]">Data</th>

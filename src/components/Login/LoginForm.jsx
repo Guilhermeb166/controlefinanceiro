@@ -73,7 +73,7 @@ export default function LoginForm() {
       <button
       type="button"
         onClick={handleLogin}
-        className="mt-5 cursor-pointer w-[60%] max-w-sm bg-linear-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group"
+        className="mt-5 cursor-pointer w-full sm:w-[60%] max-w-sm bg-linear-to-r from-emerald-600 to-emerald-700 text-white py-2.5 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transform hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 group"
       >
         Entrar
         <MdArrowForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
