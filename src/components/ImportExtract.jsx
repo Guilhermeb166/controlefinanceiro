@@ -1,16 +1,19 @@
 "use client"
 import { useRef, useState } from "react"
 import { useExpenses } from "@/context/AppContext"
-import { extractFromImage } from "@/utils/extractFromImage"
+import { processExtract } from "@/utils/scanner/processExtract"
+
 
 export default function ImportExtract() {
 
     const {addExpense} = useExpenses()
+
     const [loading, setLoading] = useState(false)
-    const [step, setStep] = useState("inactive")
+    const [step, setStep] = useState("idle")
     const [file, setFile] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
     const [descricao, setDescricao] = useState("")
+
     const fileInputRef = useRef(null)
 
     async function handleImageUpload(e) {
@@ -22,30 +25,33 @@ export default function ImportExtract() {
 
     }
 
-    async function processExtract(){
+    async function process(){
         if (!file || !selectedType) return
 
         setLoading(true)
         setStep("processing")
 
-        await extractFromImage(file, (transacao)=>
-            addExpense({
+        try {
+            await processExtract(file, async (transacao) => {
+                console.log("TRANSAÇÃO DETECTADA:", transacao)
+                await addExpense({
                 ...transacao,
                 descricao: descricao || "Sem descrição",
-                tipo: selectedType
+                tipo: selectedType,
+                })
             })
-        )
 
-        setLoading(false)
-        setStep("idle")
-        setFile(null)
-        setSelectedType(null)
-        setDescricao("")
-        if (fileInputRef.current) fileInputRef.current.value = ""
-        alert("Transações importadas com sucesso!")
+            alert("Transações importadas com sucesso!")
+        } catch (err) {
+            console.error(err)
+            alert("Erro ao processar o arquivo")
+        } finally {
+            reset()
+        }
     }
 
-    function cancel(){
+    function reset(){
+        setLoading(false)
         setStep("idle")
         setFile(null)
         setSelectedType(null)
@@ -64,7 +70,7 @@ export default function ImportExtract() {
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/*,application/pdf"
                     onChange={handleImageUpload}
                     className="hidden cursor-pointer"
                 />
@@ -136,7 +142,7 @@ export default function ImportExtract() {
                                 <button
                                     type="button"
                                     disabled={!selectedType}
-                                    onClick={processExtract}
+                                    onClick={process}
                                     className={`
                                          px-4 py-2 rounded text-white w-full
                                         ${selectedType
@@ -144,12 +150,12 @@ export default function ImportExtract() {
                                         : "bg-gray-300 cursor-not-allowed"}
                                     `}
                                     >
-                                    Pronto
+                                     {loading ? "Processando..." : "Pronto"}
                                 </button>
                                 <button
                                     type="button"
                                     className="w-full cursor-pointer px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-                                    onClick={cancel}
+                                    onClick={reset}
                                 >
                                     Cancelar
                                 </button>
