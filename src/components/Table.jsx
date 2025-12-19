@@ -43,7 +43,7 @@ export default function Table({ expenses }) {
                     <div className="flex justify-between text-sm text-gray-500">
                     <span>{item.data}</span>
                     <FaTrash
-                        className="text-red-600 cursor-pointer"
+                        className="text-red-600 cursor-pointer text-lg"
                         onClick={() => askDelete(item)}
                     />
                     </div>

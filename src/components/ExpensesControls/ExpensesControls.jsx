@@ -33,11 +33,11 @@ export default function ExpensesControls({
         <>
             <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start mt-6">
                 <SortControl sortBy={sortBy} setSortBy={setSortBy}/>
-                <div className="flex items-center gap-5 sm:gap-2">
+                <div className="flex items-center gap-4 sm:gap-2">
                     <button
                         type="button"
                         onClick={()=>setIsFilterOpen(true)}
-                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[13px] sm:py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
                     >
                         <CiFilter size={20}/>
                         {activeFiltersCount > 0 && (
@@ -60,7 +60,7 @@ export default function ExpensesControls({
                     <button
                         type="button"
                         onClick={()=> exportExpensesToExcel(expenses)}
-                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[13px] sm:py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
                     >
                         <LuFileSpreadsheet size={20}/>
                     </button>

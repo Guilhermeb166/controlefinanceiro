@@ -1,12 +1,18 @@
 'use client'
 import { useState } from 'react';
 import Modal from 'react-modal'
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
+import { CATEGORIES } from '@/utils/categories';
+
 
 
 export default function Model({ isOpen,setIsOpen }) {
 
     const { addExpense } = useExpenses();
+
+    const [categoria, setCategoria] = useState(null)
+    const [subcategoria, setSubcategoria] = useState(null)
     const [descricao, setDescricao] = useState("");
     const [valor, setValor] = useState("");
     const [tipo, setTipo] = useState("");
@@ -17,13 +23,25 @@ export default function Model({ isOpen,setIsOpen }) {
             return;
         }
 
+        if (categoria.subcategorias.length > 0 && !subcategoria) {
+            alert("Selecione uma subcategoria.")
+            return
+        }
+
         const data = new Date().toLocaleDateString()
         
         addExpense({
-            descricao,
+            observacao: descricao || "",
             valor: Number(valor),
             tipo,
-            data
+            data,
+            categoria: {
+            id: categoria.id,
+            nome: categoria.nome
+            },
+            subcategoria: subcategoria
+            ? { id: subcategoria.id, nome: subcategoria.nome }
+            : null
         })
 
         setDescricao('')
@@ -47,16 +65,45 @@ export default function Model({ isOpen,setIsOpen }) {
                 </svg>
             </button>
             <h2 className="text-2xl sm:text-3xl mb-4">Criar nova transação</h2>
-            <label className="flex flex-col mb-2">
-                Descrição
-                <input
-                    type="text"
-                    className="py-2 px-3 outline-none border border-gray-300 mt-1 rounded"
-                    value={descricao}
-                    onChange={(e)=> setDescricao(e.target.value)}
-                    required
-                />
-            </label>
+            <FormControl fullWidth size="small" className="my-2">
+                <InputLabel>Categoria</InputLabel>
+                <Select
+                    value={categoria?.id || ""}
+                    label="Categoria"
+                    onChange={(e) => {
+                    const cat = CATEGORIES.find(c => c.id === e.target.value)
+                    setCategoria(cat)
+                    setSubcategoria(null)
+                    }}
+                >
+                    {CATEGORIES.map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>
+                        {cat.nome}
+                    </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            {categoria?.subcategorias?.length > 0 && (
+                <FormControl fullWidth size="small" className="my-2">
+                    <InputLabel>Subcategoria</InputLabel>
+                    <Select
+                    value={subcategoria?.id || ""}
+                    label="Subcategoria"
+                    onChange={(e) => {
+                        const sub = categoria.subcategorias.find(
+                        s => s.id === e.target.value
+                        )
+                        setSubcategoria(sub)
+                    }}
+                    >
+                    {categoria.subcategorias.map(sub => (
+                        <MenuItem key={sub.id} value={sub.id}>
+                        {sub.nome}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                </FormControl>
+            )}
             <p>Tipo</p>
             <div className="flex gap-2 sm:gap-4 mt-1 justify-between">
                 <button
@@ -74,7 +121,7 @@ export default function Model({ isOpen,setIsOpen }) {
                 >Despesa</button>
                 
             </div>
-            {tipo ==='Despesa' || tipo === 'Crédito' || tipo ==='Débito/Pix' ?(
+            {tipo ==='Despesa' || tipo === 'Crédito' || tipo ==='Débito/Pix' && (
                 <div className='flex justify-between gap-4'>
                     <button type="button"
                         className={`flex-1 p-3 rounded bg-sky-700 text-white text-md mt-4 max-w-[50%] cursor-pointer
@@ -87,7 +134,17 @@ export default function Model({ isOpen,setIsOpen }) {
                         onClick={()=> setTipo("Débito/Pix")}
                     >Débito/Pix</button>
                 </div>
-                ) : ''}
+            )}
+            <label className="flex flex-col my-2">
+                Observação
+                <input
+                    type="text"
+                    className="py-2 px-3 outline-none border border-gray-300 mt-1 rounded"
+                    value={descricao}
+                    onChange={(e) => setDescricao(e.target.value)}
+                    placeholder="Ex: Conta de luz, mercado, aluguel..."
+                />
+            </label>
             <label className="flex flex-col my-2">
                 Valor
                 <p className="flex py-2 px-3 outline-none border border-gray-300 mt-1 rounded">
