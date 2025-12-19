@@ -4,12 +4,13 @@ import Modal from 'react-modal'
 import { useExpenses } from '@/context/AppContext'
 
 
-export default function Model({ isOpen,setIsOpen }) {
+export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
 
     const { addExpense } = useExpenses();
     const [descricao, setDescricao] = useState("");
     const [valor, setValor] = useState("");
     const [tipo, setTipo] = useState("");
+
 
     const submitForm = (()=>{
         if(!descricao || !valor || !tipo){
@@ -25,7 +26,11 @@ export default function Model({ isOpen,setIsOpen }) {
             tipo,
             data
         })
-
+        setSnackbar({
+            open: true,
+            message: "Transação criada com sucesso!",
+            severity: "success",
+        })
         setDescricao('')
         setValor('')
         setTipo('')
@@ -69,7 +74,7 @@ export default function Model({ isOpen,setIsOpen }) {
                 <button
                 type="button"
                 className={`flex-1 p-3 rounded bg-red-600 text-white cursor-pointer max-w-[50%] w-full hover:bg-red-800 transition-all duration-300
-                    ${tipo === 'Despesa' ? "bg-red-800 shadow-red-800 shadow-sm" : "bg-red-600"}`}
+                    ${tipo ==='Despesa' || tipo === 'Crédito' || tipo ==='Débito/Pix' ? "bg-red-800 shadow-red-800 shadow-sm " : "bg-red-600"}`}
                 onClick={()=> setTipo("Despesa")}
                 >Despesa</button>
                 

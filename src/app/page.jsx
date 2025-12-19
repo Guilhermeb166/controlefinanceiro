@@ -11,6 +11,7 @@ import { formatCurrency } from "@/utils/FormatCurrency";
 import UserDropdown from "@/components/UserDropdown";
 import {useAppRouter} from "@/utils/useAppRouter"
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
+import AppSnackbar from "@/components/AppSnackbar";
 
 export default function Home() {
     const [user, setUser] = useState(null)
@@ -23,6 +24,11 @@ export default function Home() {
         tipo:"all",
         month:"all",
         year:"all"
+    })
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
     })
     const [appliedFilters, setAppliedFilters] = useState(filters)
     
@@ -124,6 +130,7 @@ export default function Home() {
             <Model
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
+                setSnackbar={setSnackbar}
             />
             <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
                 <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between">
@@ -225,6 +232,12 @@ export default function Home() {
                 />
                 <Table expenses={filteredExpenses}/>
             </section>
+            <AppSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+            />
         </main>
     );
 }

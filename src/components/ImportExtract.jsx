@@ -1,7 +1,10 @@
 "use client"
+
 import { useRef, useState } from "react"
+
 import { useExpenses } from "@/context/AppContext"
 import { processExtract } from "@/utils/scanner/processExtract"
+import AppSnackbar from "./AppSnackbar"
 
 
 export default function ImportExtract() {
@@ -9,6 +12,11 @@ export default function ImportExtract() {
     const {addExpense} = useExpenses()
 
     const [loading, setLoading] = useState(false)
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    })
     const [step, setStep] = useState("idle")
     const [file, setFile] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
@@ -41,10 +49,18 @@ export default function ImportExtract() {
                 })
             })
 
-            alert("Transações importadas com sucesso!")
+            setSnackbar({
+                open: true,
+                message: "Transações importadas com sucesso!",
+                severity: "success",
+            })
         } catch (err) {
             console.error(err)
-            alert("Erro ao processar o arquivo")
+            setSnackbar({
+                open: true,
+                message: "Erro ao processar o arquivo",
+                severity: "error",
+            })
         } finally {
             reset()
         }
@@ -167,6 +183,12 @@ export default function ImportExtract() {
             {step === "processing" && (
                 <p className="text-sm text-gray-600 mt-2">Lendo imagem...</p>
             )}
+            <AppSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+            />
         </div>
     )
 }
