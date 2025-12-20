@@ -24,6 +24,11 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             return;
         }
 
+        if(!categoria){
+            alert("Escolha uma categoria para a sua transação.")
+            return
+        }
+
         if (categoria.subcategorias.length > 0 && !subcategoria) {
             alert("Selecione uma subcategoria.")
             return
@@ -70,45 +75,85 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
                 </svg>
             </button>
             <h2 className="text-2xl sm:text-3xl mb-4">Criar nova transação</h2>
-            <FormControl fullWidth size="small" className="my-2">
-                <InputLabel>Categoria</InputLabel>
-                <Select
-                    value={categoria?.id || ""}
-                    label="Categoria"
-                    onChange={(e) => {
-                    const cat = CATEGORIES.find(c => c.id === e.target.value)
-                    setCategoria(cat)
-                    setSubcategoria(null)
+            <div className='flex flex-col gap-5 mb-3'>
+                <FormControl fullWidth size="small" className="my-2"
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#009966",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            "&.Mui-focused": {
+                                color: "#009966",
+                            },
+                        },
                     }}
                 >
-                    {CATEGORIES.map(cat => (
-                    <MenuItem key={cat.id} value={cat.id}>
-                        {cat.nome}
-                    </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-            {categoria?.subcategorias?.length > 0 && (
-                <FormControl fullWidth size="small" className="my-2">
-                    <InputLabel>Subcategoria</InputLabel>
+                    <InputLabel>Categoria</InputLabel>
                     <Select
-                    value={subcategoria?.id || ""}
-                    label="Subcategoria"
-                    onChange={(e) => {
-                        const sub = categoria.subcategorias.find(
-                        s => s.id === e.target.value
-                        )
-                        setSubcategoria(sub)
-                    }}
+                        value={categoria?.id || ""}
+                        label="Categoria"
+                        onChange={(e) => {
+                        const cat = CATEGORIES.find(c => c.id === e.target.value)
+                        setCategoria(cat)
+                        setSubcategoria(null)
+                        }}
                     >
-                    {categoria.subcategorias.map(sub => (
-                        <MenuItem key={sub.id} value={sub.id}>
-                        {sub.nome}
+                        {CATEGORIES.map(cat => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                            {cat.nome}
                         </MenuItem>
-                    ))}
+                        ))}
                     </Select>
                 </FormControl>
-            )}
+                {categoria?.subcategorias?.length > 0 && (
+                    <FormControl fullWidth size="small" className="my-2"
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": {
+                                    borderColor: "#d1d5dc",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "#d1d5dc",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#009966",
+                                },
+                            },
+                            "& .MuiInputLabel-root": {
+                                "&.Mui-focused": {
+                                    color: "#009966",
+                                },
+                            },
+                        }}
+                    >
+                        <InputLabel>Subcategoria</InputLabel>
+                        <Select
+                        value={subcategoria?.id || ""}
+                        label="Subcategoria"
+                        onChange={(e) => {
+                            const sub = categoria.subcategorias.find(
+                            s => s.id === e.target.value
+                            )
+                            setSubcategoria(sub)
+                        }}
+                        >
+                        {categoria.subcategorias.map(sub => (
+                            <MenuItem key={sub.id} value={sub.id}>
+                            {sub.nome}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                )}
+            </div>
             <p>Tipo</p>
             <div className="flex gap-2 sm:gap-4 mt-1 justify-between">
                 <button
@@ -126,7 +171,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
                 >Despesa</button>
                 
             </div>
-            {tipo ==='Despesa' || tipo === 'Crédito' || tipo ==='Débito/Pix' && (
+            {(tipo === 'Despesa' || tipo === 'Crédito' || tipo === 'Débito/Pix') && (
                 <div className='flex justify-between gap-4'>
                     <button type="button"
                         className={`flex-1 p-3 rounded bg-sky-700 text-white text-md mt-4 max-w-[50%] cursor-pointer

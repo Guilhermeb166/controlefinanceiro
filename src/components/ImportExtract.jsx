@@ -4,13 +4,17 @@ import { useRef, useState } from "react"
 
 import { useExpenses } from "@/context/AppContext"
 import { processExtract } from "@/utils/scanner/processExtract"
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import AppSnackbar from "./AppSnackbar"
+import { CATEGORIES } from '@/utils/categories';
 
 
 export default function ImportExtract() {
 
     const {addExpense} = useExpenses()
 
+    const [categoria, setCategoria] = useState(null)
+    const [subcategoria, setSubcategoria] = useState(null)
     const [loading, setLoading] = useState(false)
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -20,7 +24,7 @@ export default function ImportExtract() {
     const [step, setStep] = useState("idle")
     const [file, setFile] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
-    const [descricao, setDescricao] = useState("")
+    const [observacao, setObservacao] = useState("")
 
     const fileInputRef = useRef(null)
 
@@ -40,12 +44,31 @@ export default function ImportExtract() {
         setStep("processing")
 
         try {
+             if(!categoria){
+                alert("Escolha uma categoria para a sua transação.")
+                return
+            }
+
+            if (categoria.subcategorias.length > 0 && !subcategoria) {
+                alert("Selecione uma subcategoria.")
+                return
+            }
             await processExtract(file, async (transacao) => {
                 console.log("TRANSAÇÃO DETECTADA:", transacao)
                 await addExpense({
-                ...transacao,
-                descricao: descricao || "Sem descrição",
-                tipo: selectedType,
+                    ...transacao,
+                    tipo: selectedType,
+                    categoria: {
+                    id: categoria.id,
+                    nome: categoria.nome,
+                    },
+                    subcategoria: subcategoria
+                    ? {
+                        id: subcategoria.id,
+                        nome: subcategoria.nome,
+                        }
+                    : null,
+                    observacao: observacao || "",
                 })
             })
 
@@ -71,7 +94,9 @@ export default function ImportExtract() {
         setStep("idle")
         setFile(null)
         setSelectedType(null)
-        setDescricao("")
+        setCategoria(null)
+        setSubcategoria(null)
+        setObservacao("")
 
         if (fileInputRef.current) fileInputRef.current.value = ""
     }
@@ -111,13 +136,85 @@ export default function ImportExtract() {
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white p-4 rounded-lg shadow-lg w-100">
                         <h2 className="text-lg font-semibold mb-4">Selecione o tipo de transação</h2>
-                        <input
-                            type="text"
-                            placeholder="Descrição (ex: Mercado, Uber, Almoço)"
-                            value={descricao}
-                            onChange={(e) => setDescricao(e.target.value)}
-                            className="w-full mb-4 px-3 py-2 border border-gray-300 hover:border-gray-400 rounded-md outline-none focus:border-gray-400 shadow-md"
-                        />
+                        <div className='flex flex-col gap-5 mb-6'>
+                            <FormControl fullWidth size="small" className="my-2"
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "#d1d5dc",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "#d1d5dc",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#009966",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        "&.Mui-focused": {
+                                            color: "#009966",
+                                        },
+                                    },
+                                }}
+                            >
+                                <InputLabel>Categoria</InputLabel>
+                                <Select
+                                    value={categoria?.id || ""}
+                                    label="Categoria"
+                                    onChange={(e) => {
+                                    const cat = CATEGORIES.find(c => c.id === e.target.value)
+                                    setCategoria(cat)
+                                    setSubcategoria(null)
+                                    }}
+                                >
+                                    {CATEGORIES.map(cat => (
+                                    <MenuItem key={cat.id} value={cat.id}>
+                                        {cat.nome}
+                                    </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {categoria?.subcategorias?.length > 0 && (
+                                <FormControl fullWidth size="small" className="my-2"
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": {
+                                                borderColor: "#d1d5dc",
+                                            },
+                                            "&:hover fieldset": {
+                                                borderColor: "#d1d5dc",
+                                            },
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "#009966",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            "&.Mui-focused": {
+                                                color: "#009966",
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <InputLabel>Subcategoria</InputLabel>
+                                    <Select
+                                    value={subcategoria?.id || ""}
+                                    label="Subcategoria"
+                                    onChange={(e) => {
+                                        const sub = categoria.subcategorias.find(
+                                        s => s.id === e.target.value
+                                        )
+                                        setSubcategoria(sub)
+                                    }}
+                                    >
+                                    {categoria.subcategorias.map(sub => (
+                                        <MenuItem key={sub.id} value={sub.id}>
+                                        {sub.nome}
+                                        </MenuItem>
+                                    ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                        </div>
                         <div className="flex flex-col gap-3">
                             <button
                                 type="button"
@@ -154,6 +251,13 @@ export default function ImportExtract() {
                                     Despesa Débito / Pix
                                 </button>
                             </div>
+                            <input
+                                type="text"
+                                className="py-2 px-3 outline-none border border-gray-300 mt-1 rounded"
+                                value={observacao}
+                                onChange={(e) => setObservacao(e.target.value)}
+                                placeholder="Observação"
+                            />
                             <div className="flex items-center justify-between w-full gap-3 mt-5">
                                 <button
                                     type="button"
