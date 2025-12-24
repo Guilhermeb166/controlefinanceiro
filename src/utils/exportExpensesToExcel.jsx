@@ -12,10 +12,11 @@ export async function exportExpensesToExcel(expenses) {
     const worksheet = workbook.addWorksheet("Despesas")
 
     worksheet.columns = [
-        { header: "Data", key: "data", width: 14},
-        { header: "Descrição", key: "descricao", width: 32 },
-        { header: "Valor", key:"valor", width: 16 },
-        { header: "Tipo", key:"tipo", width: 22 },
+        { header: "Data", key: "data", width: 14 },
+        { header: "Categoria", key: "categoria", width: 32 },
+        { header: "Observação", key: "observacao", width: 40 },
+        { header: "Valor", key: "valor", width: 16 },
+        { header: "Tipo", key: "tipo", width: 22 },
     ]
 
     worksheet.getRow(1).font = {bold: true}
@@ -24,7 +25,10 @@ export async function exportExpensesToExcel(expenses) {
     expenses.forEach(item => {
         worksheet.addRow({
             data: item.data,
-            descricao: item.descricao,
+            categoria: item.subcategoria?.nome
+                ? `${item.categoria.nome} / ${item.subcategoria.nome}`
+                : item.categoria?.nome || "-",
+            observacao: item.observacao || "Sem observação",
             valor: Number(item.valor),
             tipo: item.tipo,
         })
