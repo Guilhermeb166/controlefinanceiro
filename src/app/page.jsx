@@ -13,6 +13,7 @@ import { useAppRouter } from "@/utils/useAppRouter"
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 import AppSnackbar from "@/components/AppSnackbar";
 import { IoMenu } from "react-icons/io5";
+import SideMenu from "@/components/SideMenu/SideMenu";
 
 export default function Home() {
     const [user, setUser] = useState(null)
@@ -20,6 +21,7 @@ export default function Home() {
     const router = useAppRouter()
 
     const [isOpen, setIsOpen] = useState(false)
+    const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
     const [sortBy, setSortBy] = useState("date-desc")
     const [filters, setFilters] = useState({
         tipo: "all",
@@ -128,6 +130,13 @@ export default function Home() {
 
     return (
         <main className="min-h-screen bg-neutral-200 pb-30">
+            
+            
+            <SideMenu
+                isOpen={isSideMenuOpen}
+                onClose={() => setIsSideMenuOpen(false)}
+              
+            />
             <Model
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
@@ -138,9 +147,10 @@ export default function Home() {
                 <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between relative px-5">
                     <button
                         type="button"
+                        onClick={() => setIsSideMenuOpen(true)}
                         className="fixed top-5 left-4 z-50 text-white text-4xl cursor-pointer"
                     >
-                        <IoMenu />
+                        <IoMenu className={`${isSideMenuOpen? "opacity-0" : "opacity-100"}`}/>
                     </button>
                     <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
                     <div className="flex items-center gap-3 flex-wrap sm:flex-row justify-center">
