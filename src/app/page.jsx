@@ -1,7 +1,7 @@
 'use client'
 
 import { onAuthStateChanged } from "firebase/auth"
-import { useEffect, useState, useMemo   } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { auth } from "@/backend/firebase"
 import ImportExtract from "@/components/ImportExtract";
 import Model from "@/components/Model";
@@ -9,9 +9,10 @@ import Table from "@/components/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
 import UserDropdown from "@/components/UserDropdown";
-import {useAppRouter} from "@/utils/useAppRouter"
+import { useAppRouter } from "@/utils/useAppRouter"
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 import AppSnackbar from "@/components/AppSnackbar";
+import { IoMenu } from "react-icons/io5";
 
 export default function Home() {
     const [user, setUser] = useState(null)
@@ -21,9 +22,9 @@ export default function Home() {
     const [isOpen, setIsOpen] = useState(false)
     const [sortBy, setSortBy] = useState("date-desc")
     const [filters, setFilters] = useState({
-        tipo:"all",
-        month:"all",
-        year:"all"
+        tipo: "all",
+        month: "all",
+        year: "all"
     })
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -31,9 +32,9 @@ export default function Home() {
         severity: "success",
     })
     const [appliedFilters, setAppliedFilters] = useState(filters)
-    
 
-     function applyFilters() {
+
+    function applyFilters() {
         setAppliedFilters(filters)
     }
 
@@ -41,16 +42,16 @@ export default function Home() {
         return (expenses ?? []).reduce(
             (acc, item) => {
                 if (item.tipo === "Receita") {
-                acc.entradas += item.valor
-                acc.total += item.valor
+                    acc.entradas += item.valor
+                    acc.total += item.valor
                 } else {
-                acc.saidas += item.valor
-                acc.total -= item.valor
+                    acc.saidas += item.valor
+                    acc.total -= item.valor
                 }
                 return acc
             },
             { entradas: 0, saidas: 0, total: 0 }
-            )
+        )
     }, [expenses])
 
 
@@ -60,63 +61,63 @@ export default function Home() {
         if (appliedFilters.tipo !== "all") {
             if (appliedFilters.tipo === "Despesa") {
                 data = data.filter(e =>
-                e.tipo === "Crédito" ||
-                e.tipo === "Débito/Pix"
+                    e.tipo === "Crédito" ||
+                    e.tipo === "Débito/Pix"
                 )
             } else {
                 data = data.filter(e => e.tipo === appliedFilters.tipo)
             }
         }
 
-    if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
-      data = data.filter(e => {
-        const [_, month, year] = e.data.split("/")
+        if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
+            data = data.filter(e => {
+                const [_, month, year] = e.data.split("/")
 
-        if (
-          appliedFilters.month !== "all" &&
-          Number(month) !== Number(appliedFilters.month)
-        ) {
-          return false
+                if (
+                    appliedFilters.month !== "all" &&
+                    Number(month) !== Number(appliedFilters.month)
+                ) {
+                    return false
+                }
+
+                if (
+                    appliedFilters.year !== "all" &&
+                    Number(year) !== Number(appliedFilters.year)
+                ) {
+                    return false
+                }
+
+                return true
+            })
         }
 
-        if (
-          appliedFilters.year !== "all" &&
-          Number(year) !== Number(appliedFilters.year)
-        ) {
-          return false
-        }
 
-        return true
-      })
-    }
-
-
-    switch (sortBy) {
-        case "value-desc":
-            data.sort((a, b) => b.valor - a.valor)
-            break
-        case "value-asc":
-            data.sort((a, b) => a.valor - b.valor)
-            break
-        case "date-asc":
-            data.sort(
-            (a, b) =>
-                new Date(a.data.split("/").reverse().join("-")) -
-                new Date(b.data.split("/").reverse().join("-"))
-            )
-            break
-        case "date-desc":
-        default:
-            data.sort(
-            (a, b) =>
-                new Date(b.data.split("/").reverse().join("-")) -
-                new Date(a.data.split("/").reverse().join("-"))
-            )
+        switch (sortBy) {
+            case "value-desc":
+                data.sort((a, b) => b.valor - a.valor)
+                break
+            case "value-asc":
+                data.sort((a, b) => a.valor - b.valor)
+                break
+            case "date-asc":
+                data.sort(
+                    (a, b) =>
+                        new Date(a.data.split("/").reverse().join("-")) -
+                        new Date(b.data.split("/").reverse().join("-"))
+                )
+                break
+            case "date-desc":
+            default:
+                data.sort(
+                    (a, b) =>
+                        new Date(b.data.split("/").reverse().join("-")) -
+                        new Date(a.data.split("/").reverse().join("-"))
+                )
         }
 
         return data
     }, [expenses, sortBy, appliedFilters])
-  
+
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (firebaseUser) => {
             setUser(firebaseUser)
@@ -133,15 +134,22 @@ export default function Home() {
                 setSnackbar={setSnackbar}
             />
             <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
-                <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between">
+
+                <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between relative px-5">
+                    <button
+                        type="button"
+                        className="fixed top-5 left-4 z-50 text-white text-4xl cursor-pointer"
+                    >
+                        <IoMenu />
+                    </button>
                     <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
                     <div className="flex items-center gap-3 flex-wrap sm:flex-row justify-center">
-                            <ImportExtract />
-                            <button
-                                type="button"
-                                className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
-                                onClick={() => setIsOpen(true)}
-                            >
+                        <ImportExtract />
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
+                            onClick={() => setIsOpen(true)}
+                        >
                             <svg
                                 aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -152,17 +160,17 @@ export default function Home() {
                                 className="size-6"
                             >
                                 <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 4.5v15m7.5-7.5h-15"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 4.5v15m7.5-7.5h-15"
                                 />
                             </svg>
                             Nova Transação
-                            </button>
+                        </button>
                         {user ? (
                             <UserDropdown user={user} />
                         ) : (
-                            <button 
+                            <button
                                 type="button"
                                 className="cursor-pointer flex items-center gap-2 rounded-md p-2 bg-emerald-500 text-white hover:bg-emerald-700 transition-all"
                                 onClick={() => router.goLogin()}
@@ -230,7 +238,7 @@ export default function Home() {
                     onApplyFilters={applyFilters}
                     expenses={filteredExpenses}
                 />
-                <Table expenses={filteredExpenses}/>
+                <Table expenses={filteredExpenses} />
             </section>
             <AppSnackbar
                 open={snackbar.open}
