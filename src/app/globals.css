@@ -27,3 +27,12 @@ body {
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
 }
+.recharts-wrapper,
+.recharts-surface,
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface:focus-visible {
+  outline: none ;
+
+}

@@ -1,27 +1,26 @@
 'use client'
 
-import { onAuthStateChanged } from "firebase/auth"
-import { useEffect, useState, useMemo } from "react";
-import { auth } from "@/backend/firebase"
+import UserAuthButton from "@/components/UserAuthButton/UserAuthButton"
+import { useState, useMemo } from "react";
+
 import ImportExtract from "@/components/ImportExtract";
 import Model from "@/components/Model";
 import Table from "@/components/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
-import UserDropdown from "@/components/UserDropdown";
-import { useAppRouter } from "@/utils/useAppRouter"
+
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 import AppSnackbar from "@/components/AppSnackbar";
-import { IoMenu } from "react-icons/io5";
-import SideMenu from "@/components/SideMenu/SideMenu";
+
+
 
 export default function Home() {
-    const [user, setUser] = useState(null)
+
     const { expenses } = useExpenses()
-    const router = useAppRouter()
 
     const [isOpen, setIsOpen] = useState(false)
-    const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
+    
+    
     const [sortBy, setSortBy] = useState("date-desc")
     const [filters, setFilters] = useState({
         tipo: "all",
@@ -120,23 +119,11 @@ export default function Home() {
         return data
     }, [expenses, sortBy, appliedFilters])
 
-    useEffect(() => {
-        const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-            setUser(firebaseUser)
-        })
-
-        return () => unsub()
-    }, [])
+    
 
     return (
         <main className="min-h-screen bg-neutral-200 pb-30">
             
-            
-            <SideMenu
-                isOpen={isSideMenuOpen}
-                onClose={() => setIsSideMenuOpen(false)}
-              
-            />
             <Model
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
@@ -145,13 +132,7 @@ export default function Home() {
             <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
 
                 <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between relative px-5">
-                    <button
-                        type="button"
-                        onClick={() => setIsSideMenuOpen(true)}
-                        className="fixed top-5 left-4 z-50 text-white text-4xl cursor-pointer"
-                    >
-                        <IoMenu className={`${isSideMenuOpen? "opacity-0" : "opacity-100"}`}/>
-                    </button>
+                    
                     <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
                     <div className="flex items-center gap-3 flex-wrap sm:flex-row justify-center">
                         <ImportExtract />
@@ -177,37 +158,9 @@ export default function Home() {
                             </svg>
                             Nova Transação
                         </button>
-                        {user ? (
-                            <UserDropdown user={user} />
-                        ) : (
-                            <button
-                                type="button"
-                                className="cursor-pointer flex items-center gap-2 rounded-md p-2 bg-emerald-500 text-white hover:bg-emerald-700 transition-all"
-                                onClick={() => router.goLogin()}
-                            >
-                                <svg
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="1.5"
-                                    stroke="currentColor"
-                                    className="size-6"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0
-                                        3.75 3.75 0 0 1 7.5 0ZM4.501
-                                        20.118a7.5 7.5 0 0 1
-                                        14.998 0A17.933 17.933
-                                        0 0 1 12 21.75c-2.676
-                                        0-5.216-.584-7.499-1.632Z"
-                                    />
-                                </svg>
-                            </button>
-                        )}
+                        <UserAuthButton />
                     </div>
+                    
                 </div>
             </section>
             <section className="max-w-5xl mx-auto mt-4 lg:mt-0 px-4 lg:px-0">

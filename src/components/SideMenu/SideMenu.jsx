@@ -1,16 +1,43 @@
+"use client"
+
 import { IoClose } from "react-icons/io5";
 import { 
   MdDashboard, 
-  MdSummarize, 
-  MdAssessment 
+  MdHome, 
+  MdAssessment  
 } from "react-icons/md";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function SideMenu({isOpen, onClose}) {
+    const pathname = usePathname()
+
     const menuItems = [
-        { icon: MdDashboard, label: "Dashboards", active: true },
-        { icon: MdSummarize, label: "Resumo Geral", active: false },
-        { icon: MdAssessment, label: "Relatórios", active: false }
+        {   
+            icon: MdHome,
+            label: "Ínicio",
+            href: "/",
+            active: pathname === "/" 
+        },
+        {
+            icon: MdDashboard,
+            label: "Dashboards",
+            href: "/dashboards",
+            active: pathname === "/dashboards" || pathname.startsWith("/dashboard/")
+        },
+        {
+            icon: MdAssessment,
+            label: "Gráficos",
+            href: "/charts",
+            active: false
+        }
     ];
+
+    const handleItemClick = () => {
+        if (window.innerWidth < 768) {
+            onClose()
+        }
+    }
 
     return (
     
@@ -35,9 +62,10 @@ export default function SideMenu({isOpen, onClose}) {
 
                 <nav className="flex flex-col p-4 gap-2">
                     {menuItems.map((item) => (
-                        <button
-                            key={item}
-                            type="button"
+                        <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={handleItemClick}
                             className={`
                                 flex items-center gap-4 px-4 py-3 rounded-lg text-left
                                 transition-all duration-200 group cursor-pointer 
@@ -45,6 +73,7 @@ export default function SideMenu({isOpen, onClose}) {
                                     ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30" 
                                     : "text-gray-300 hover:bg-gray-800 hover:text-white"
                                 }
+                                no-underline
                             `}
                         >
                             <item.icon className={`
@@ -52,7 +81,7 @@ export default function SideMenu({isOpen, onClose}) {
                                 ${item.active ? "" : "group-hover:scale-110"}
                             `}/>
                             <span className="font-medium">{item.label}</span>
-                        </button>
+                        </Link>
                     ))}
                 </nav>
 
