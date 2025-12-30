@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useExpenses } from "@/context/AppContext"
 import {
   LineChart,
@@ -14,34 +14,42 @@ import {
   CartesianGrid
 } from "recharts"
 import { formatCurrency } from "@/utils/FormatCurrency"
+import { isSameMonth, isSameWeek, isSameYear, parseBRDate } from "@/utils/dashboard/dateHelpers"
+import { WEEK_DAYS } from "@/utils/dashboard/constants"
+import {
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select
+} from "@mui/material"
 
 export default function GeneralAnalysis() {
     const { expenses } = useExpenses()
+
     const [period, setPeriod] = useState("monthly")
+    const [chartType, setChartType] = useState("bar")
+    const [view, setView] = useState("main") 
+
+    const [leftMonth, setLeftMonth] = useState(new Date().getMonth())
+    const [rightMonth, setRightMonth] = useState(new Date().getMonth() - 1)
+
+    const [leftYear, setLeftYear] = useState(new Date().getFullYear())
+    const [rightYear, setRightYear] = useState(new Date().getFullYear())
+
+    const now = new Date()
 
     const filteredExpenses = useMemo(() => {
-        const now = new Date()
-
         return expenses.filter(e => {
-        if (!e.data) return false
+            if (!e.data) return false
+            const date = parseBRDate(e.data)
 
-        const [d, m, y] = e.data.split("/")
-        const date = new Date(y, m - 1, d)
+            if (period === "weekly") return isSameWeek(date, now)
+            if (period === "monthly") return isSameMonth(date, now)
+            if (period === "yearly") return isSameYear(date, now)
 
-        if (period === "monthly") {
-            return (
-            date.getMonth() === now.getMonth() &&
-            date.getFullYear() === now.getFullYear()
-            )
-        }
-
-        if (period === "yearly") {
-            return date.getFullYear() === now.getFullYear()
-        }
-
-        return true
+            return true
         })
-    }, [expenses, period])
+    }, [expenses, period, now])
 
     /* =========================
      KPIs
@@ -64,121 +72,202 @@ export default function GeneralAnalysis() {
             balance: income - expense
         }
     }, [filteredExpenses])
-
-    /* =========================
-        DADOS GRÁFICO LINHA
+    
+     /* =========================
+     GRÁFICO PRINCIPAL (BARRAS)
     ========================= */
-    const lineData = useMemo(() => {
-        const map = {}
+    const mainBarData = useMemo(() => {
+        if (period === "weekly") {
+        const map = Object.fromEntries(WEEK_DAYS.map(d => [d, { income: 0, expense: 0 }]))
 
-        filteredExpenses.forEach(e => {
-        const key = e.data
+        expenses.forEach(e => {
+            const date = parseBRDate(e.data)
+            if (isSameWeek(date, now)) {
+            const index = (date.getDay() + 6) % 7
+            const key = WEEK_DAYS[index]
 
-        if (!map[key]) {
-            map[key] = {
-            date: key,
-            income: 0,
-            expense: 0
+            if(e.tipo === "Receita"){
+                map[key].income += e.valor
+            } else {
+                map[key].expense += e.valor
             }
+            }
+        })
+
+        return WEEK_DAYS.map(d => ({ name: d, ...map[d] }))
         }
 
-        if (e.tipo === "Receita") {
-            map[key].income += e.valor
-        } else {
-            map[key].expense += e.valor
+        if (period === "monthly") {
+            const months = Array.from({ length: 12 }, (_, i) => i)
+            const map = {}
+
+            months.forEach(m => {
+                map[m] = { income: 0, expense: 0 }
+            })
+
+            expenses.forEach(e => {
+                const date = parseBRDate(e.data)
+                if (date.getFullYear() === now.getFullYear()) {
+                    const m = date.getMonth()
+                    if(e.tipo === "Receita"){
+                        map[m].income += e.valor
+                    } else{
+                        map[m].expense += e.valor
+                    }
+                }
+            })
+
+            return months.map(m => ({
+                name: new Date(2024, m).toLocaleString("pt-BR", { month: "short" }),
+                ...map[m]
+            }))
+        }
+
+        // yearly
+        const years = Array.from({ length: 6 }, (_, i) => now.getFullYear() - i)
+        const map = {}
+
+        years.forEach(y => {
+        map[y] = { income: 0, expense: 0 }
+        })
+
+        expenses.forEach(e => {
+        const date = parseBRDate(e.data)
+        if (map[date.getFullYear()]) {
+            if(e.tipo === "Receita"){
+                map[date.getFullYear()].income += e.valor
+            } else{
+                map[date.getFullYear()].expense += e.valor
+            }
+
         }
         })
 
-        return Object.values(map)
-    }, [filteredExpenses])
+        return years.reverse().map(y => ({ name: y, ...map[y] }))
+    }, [expenses, period, now])
 
     /* =========================
-        DADOS GRÁFICO BARRAS
+        DADOS GRÁFICOS BARRAS
     ========================= */
-    const barData = [
-        {
-            name: "Entradas",
-            value: summary.income
-        },
-        {
-            name: "Saídas",
-            value: summary.expense
-        }
-    ]
+    const buildBarData = useCallback((month, year) => {
+        let income = 0
+        let expense = 0
+
+        expenses.forEach(e => {
+            const date = parseBRDate(e.data)
+            if (date.getMonth() === month && date.getFullYear() === year) {
+                if (e.tipo === "Receita") {
+                    income += e.valor
+                } else {
+                    expense += e.valor
+                }
+            }
+        })
+
+        return [
+            { name: "Receitas", value: income },
+            { name: "Despesas", value: expense }
+        ]
+    }, [expenses])
+
+    const leftBarData = useMemo(() => buildBarData(leftMonth, leftYear),
+        [buildBarData, leftMonth, leftYear]
+    )
+
+    const rightBarData = useMemo(() => buildBarData(rightMonth, rightYear),
+        [buildBarData, rightMonth, rightYear]
+    )
 
     return (
-        <div className="bg-white rounded-lg p-6 shadow">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl font-semibold">Análise Geral</h1>
+        <div className="bg-white rounded-lg p-6 shadow space-y-8">
+        {/* HEADER */}
+        <div className="flex justify-between items-center">
+            <h1 className="text-xl font-semibold">Análise Geral</h1>
 
-                <div className="flex gap-2">
-                    {["monthly", "yearly"].map(p => (
-                        <button
-                        type="button"
-                        key={p}
-                        onClick={() => setPeriod(p)}
-                        className={`px-3 py-1 rounded
-                            ${period === p
-                            ? "bg-emerald-600 text-white"
-                            : "bg-gray-200"}
-                        `}
-                        >
-                        {p === "monthly" ? "Mensal" : "Anual"}
-                        </button>
-                    ))}
-                </div>
+            <div className="flex gap-2">
+            {["weekly", "monthly", "yearly"].map(p => (
+                <button
+                type="button"
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1 rounded ${
+                    period === p ? "bg-emerald-600 text-white" : "bg-gray-200"
+                }`}
+                >
+                {p === "weekly" ? "Semanal" : p === "monthly" ? "Mensal" : "Anual"}
+                </button>
+            ))}
             </div>
+        </div>
 
-           {/* KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Kpi title="Receitas" value={summary.income} color="text-emerald-600" />
-                <Kpi title="Despesas" value={summary.expense} color="text-red-500" />
-                <Kpi title="Saldo" value={summary.balance} color="text-blue-600" />
-            </div>
+        {/* KPI */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Kpi title="Receitas" value={summary.income} color="text-emerald-600" />
+            <Kpi title="Despesas" value={summary.expense} color="text-red-600" />
+            <Kpi title="Saldo" value={summary.balance} color="text-blue-600" />
+        </div>
+        <div className="flex gap-2 mt-2">
+            <button
+                type="button"
+                onClick={() => setView("main")}
+                className={`px-3 py-1 rounded sm:cursor-pointer ${
+                    view === "main"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-gray-200"
+                }`}
+            >
+                Visão Geral
+            </button>
 
-            {/* GRÁFICOS */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* LINHA */}
-                <div className="h-[300px]">
+            <button
+                type="button"
+                onClick={() => setView("compare")}
+                className={`px-3 py-1 rounded sm:cursor-pointer ${
+                    view === "compare"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-gray-200"
+                }`}
+            >
+                Comparativo
+            </button>
+        </div>
+        {/* GRÁFICO PRINCIPAL */}
+        {view === "main" && (
+            <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={lineData}>
+                <BarChart data={mainBarData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
+                    <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={v => formatCurrency(v)} />
-
-                    <Line
-                        type="monotone"
-                        dataKey="income"
-                        stroke="#22c55e"
-                        strokeWidth={2}
-                        name="Receitas"
-                    />
-
-                    <Line
-                        type="monotone"
-                        dataKey="expense"
-                        stroke="#ef4444"
-                        strokeWidth={2}
-                        name="Despesas"
-                    />
-                    </LineChart>
+                    <Bar dataKey="income" fill="#059669" />
+                    <Bar dataKey="expense" fill="#dc2626" />
+                </BarChart>
                 </ResponsiveContainer>
-                </div>
-
-                {/* BARRAS */}
-                <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={barData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip formatter={v => formatCurrency(v)} />
-                            <Bar dataKey="value" fill="#6366f1" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
             </div>
+        )}
+        {/* COMPARATIVO */}
+        {view === "compare" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CompareBar
+                    title="Período A"
+                    data={leftBarData}
+                    month={leftMonth}
+                    setMonth={setLeftMonth}
+                    year={leftYear}
+                    setYear={setLeftYear}
+                />
+
+                <CompareBar
+                    title="Período B"
+                    data={rightBarData}
+                    month={rightMonth}
+                    setMonth={setRightMonth}
+                    year={rightYear}
+                    setYear={setRightYear}
+                />
+            </div>
+        )}
         </div>
     )
 }
@@ -193,6 +282,54 @@ function Kpi({ title, value, color }) {
         <p className={`text-xl font-semibold ${color}`}>
             {formatCurrency(value)}
         </p>
+        </div>
+    )
+}
+
+function CompareBar({ title, data, month, setMonth, year, setYear }) {
+  const years = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i)
+
+    return (
+        <div className="space-y-3">
+        <h3 className="font-medium">{title}</h3>
+
+        <div className="flex gap-2">
+            <FormControl fullWidth size="small">
+            <InputLabel>Mês</InputLabel>
+            <Select value={month} label="Mês" onChange={e => setMonth(e.target.value)}>
+                {Array.from({ length: 12 }).map((_, month) => {
+                    const label = new Date(2024, month).toLocaleString("pt-BR", { month: "long" })
+
+                    return (
+                        <MenuItem key={label} value={month}>
+                        {label}
+                        </MenuItem>
+                    )
+                })}
+            </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small">
+            <InputLabel>Ano</InputLabel>
+            <Select value={year} label="Ano" onChange={e => setYear(e.target.value)}>
+                {years.map(y => (
+                    <MenuItem key={y} value={y}>{y}</MenuItem>
+                ))}
+            </Select>
+            </FormControl>
+        </div>
+
+        <div className="h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip formatter={v => formatCurrency(v)} />
+                <Bar dataKey="value" fill="#059669" />
+            </BarChart>
+            </ResponsiveContainer>
+        </div>
         </div>
     )
 }
