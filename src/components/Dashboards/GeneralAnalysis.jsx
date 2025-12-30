@@ -3,8 +3,6 @@
 import { useState, useMemo, useCallback } from "react"
 import { useExpenses } from "@/context/AppContext"
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -28,7 +26,6 @@ export default function GeneralAnalysis() {
     const { expenses } = useExpenses()
 
     const [period, setPeriod] = useState("monthly")
-    const [chartType, setChartType] = useState("bar")
     const [view, setView] = useState("main") 
 
     const [leftMonth, setLeftMonth] = useState(new Date().getMonth())
@@ -223,7 +220,7 @@ export default function GeneralAnalysis() {
             <button
                 type="button"
                 onClick={() => setView("compare")}
-                className={`px-3 py-1 rounded sm:cursor-pointer ${
+                className={`px-3 py-1 rounded cursor-pointer ${
                     view === "compare"
                         ? "bg-emerald-600 text-white"
                         : "bg-gray-200"
@@ -234,7 +231,7 @@ export default function GeneralAnalysis() {
         </div>
         {/* GRÁFICO PRINCIPAL */}
         {view === "main" && (
-            <div className="h-80">
+            <div className="h-80 flex justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={mainBarData}>
                     <CartesianGrid strokeDasharray="3 3" />
