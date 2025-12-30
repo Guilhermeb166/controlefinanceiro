@@ -114,7 +114,7 @@ export default function CategoryAnalysis() {
             <TextField
                 select
                 label="Categoria"
-                fullWidth
+                className="max-w-100"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
             >

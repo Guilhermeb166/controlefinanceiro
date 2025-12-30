@@ -11,7 +11,8 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid
+  CartesianGrid,
+  Cell
 } from "recharts"
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { isSameMonth, isSameWeek, isSameYear, parseBRDate } from "@/utils/dashboard/dateHelpers"
@@ -190,7 +191,7 @@ export default function GeneralAnalysis() {
                 type="button"
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-3 py-1 rounded ${
+                className={`px-3 py-1 rounded cursor-pointer ${
                     period === p ? "bg-emerald-600 text-white" : "bg-gray-200"
                 }`}
                 >
@@ -233,15 +234,15 @@ export default function GeneralAnalysis() {
         </div>
         {/* GRÁFICO PRINCIPAL */}
         {view === "main" && (
-            <div className="h-[320px]">
+            <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={mainBarData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={v => formatCurrency(v)} />
-                    <Bar dataKey="income" fill="#059669" />
-                    <Bar dataKey="expense" fill="#dc2626" />
+                    <Bar dataKey="income" fill="#059669" name="Receita"/>
+                    <Bar dataKey="expense" fill="#dc2626" name="Despesa"/>
                 </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -286,50 +287,57 @@ function Kpi({ title, value, color }) {
     )
 }
 
-function CompareBar({ title, data, month, setMonth, year, setYear }) {
+function CompareBar({ title, data, month, setMonth, year, setYear, barLabel = "Valor" }) {
   const years = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i)
 
     return (
         <div className="space-y-3">
-        <h3 className="font-medium">{title}</h3>
+            <h3 className="font-medium">{title}</h3>
 
-        <div className="flex gap-2">
-            <FormControl fullWidth size="small">
-            <InputLabel>Mês</InputLabel>
-            <Select value={month} label="Mês" onChange={e => setMonth(e.target.value)}>
-                {Array.from({ length: 12 }).map((_, month) => {
-                    const label = new Date(2024, month).toLocaleString("pt-BR", { month: "long" })
+            <div className="flex gap-2">
+                <FormControl fullWidth size="small">
+                <InputLabel>Mês</InputLabel>
+                <Select value={month} label="Mês" onChange={e => setMonth(e.target.value)}>
+                    {Array.from({ length: 12 }).map((_, month) => {
+                        const label = new Date(2024, month).toLocaleString("pt-BR", { month: "long" })
 
-                    return (
-                        <MenuItem key={label} value={month}>
-                        {label}
-                        </MenuItem>
-                    )
-                })}
-            </Select>
-            </FormControl>
+                        return (
+                            <MenuItem key={label} value={month}>
+                            {label}
+                            </MenuItem>
+                        )
+                    })}
+                </Select>
+                </FormControl>
 
-            <FormControl fullWidth size="small">
-            <InputLabel>Ano</InputLabel>
-            <Select value={year} label="Ano" onChange={e => setYear(e.target.value)}>
-                {years.map(y => (
-                    <MenuItem key={y} value={y}>{y}</MenuItem>
-                ))}
-            </Select>
-            </FormControl>
-        </div>
+                <FormControl fullWidth size="small">
+                <InputLabel>Ano</InputLabel>
+                <Select value={year} label="Ano" onChange={e => setYear(e.target.value)}>
+                    {years.map(y => (
+                        <MenuItem key={y} value={y}>{y}</MenuItem>
+                    ))}
+                </Select>
+                </FormControl>
+            </div>
 
-        <div className="h-[260px]">
-            <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={v => formatCurrency(v)} />
-                <Bar dataKey="value" fill="#059669" />
-            </BarChart>
-            </ResponsiveContainer>
-        </div>
+            <div className="h-[260px]">
+                <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={v => formatCurrency(v)} />
+                    <Bar dataKey="value" name={barLabel}>
+                        {data.map((entry) => (
+                            <Cell
+                                key={entry.name}
+                                fill={entry.name === "Despesas" ? "#dc2626" : "#059669"}
+                            />
+                        ))}
+                    </Bar>
+                </BarChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     )
 }
