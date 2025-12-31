@@ -20,7 +20,7 @@
 }
 *{
 
-  scrollbar-width: none;
+
   scroll-behavior: smooth;
 }
 body {
@@ -35,4 +35,31 @@ body {
 .recharts-surface:focus-visible {
   outline: none ;
 
+}
+.scroll-hidden,body,html {
+  scrollbar-width: none;       
+  -ms-overflow-style: none;   
+}
+
+::-webkit-scrollbar {
+  height: 0;              
+}
+
+ ::-webkit-scrollbar{
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: #059669 transparent;
+}
+
+/* Chrome / Safari */
+::-webkit-scrollbar {
+  height: 12px;                         /* MAIS EM CIMA (mais fino) */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #059669;
+  border-radius: 999px;
 }

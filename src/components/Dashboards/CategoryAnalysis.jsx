@@ -5,6 +5,8 @@ import { useExpenses } from "@/context/AppContext"
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { TextField, MenuItem } from "@mui/material"
 import { formatCurrency } from "@/utils/FormatCurrency"
+import { MobileLegend } from "@/utils/dashboard/MobileLegend"
+import { useTheme, useMediaQuery } from "@mui/material"
 
 function renderPercentageLabel({ name, percent }) {
     if (!percent || percent === 0) return null
@@ -52,6 +54,9 @@ function adjustLightness(hex, percent) {
 }
 
 export default function CategoryAnalysis() {
+    const theme = useTheme()
+    const isDesktop = useMediaQuery(theme.breakpoints.up("sm"))
+
     const { expenses } = useExpenses()
     const [selectedCategory, setSelectedCategory] = useState("")
 
@@ -125,7 +130,7 @@ export default function CategoryAnalysis() {
                 ))}
             </TextField>
 
-            <div className="flex flex-col lg:flex-row h-[700px] lg:h-[350px]">
+            <div className="flex flex-col lg:flex-row h-[1200px] sm:h-[700px] lg:h-[350px] gap-30 sm:gap-0">
                 
                 <div className="w-full h-[350px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -135,7 +140,7 @@ export default function CategoryAnalysis() {
                                 dataKey="value"
                                 nameKey="name"
                                 outerRadius={110}
-                                label={renderPercentageLabel}
+                                label={isDesktop ? renderPercentageLabel : false}
                                 labelLine={false}
                             >
                                 {categoriesData.map(item => (
@@ -154,6 +159,10 @@ export default function CategoryAnalysis() {
                             />
                         </PieChart>
                     </ResponsiveContainer>
+                    <MobileLegend
+                        data={categoriesData}
+                        colors={categoryColors}
+                    />
                 </div>
 
                 {/* ===== GRÁFICO SUBCATEGORIAS ===== */}
@@ -165,7 +174,7 @@ export default function CategoryAnalysis() {
                                 dataKey="value"
                                 nameKey="name"
                                 outerRadius={110}
-                                label={renderPercentageLabel}
+                                label={isDesktop ? renderPercentageLabel : false}
                                 labelLine={false}
                             >
                                 {subcategoriesData.map(item => (
@@ -184,6 +193,10 @@ export default function CategoryAnalysis() {
                             />
                         </PieChart>
                     </ResponsiveContainer>
+                    <MobileLegend
+    data={subcategoriesData}
+    colors={subcategoryColors}
+/>
                 </div>
             </div>
         </div>
