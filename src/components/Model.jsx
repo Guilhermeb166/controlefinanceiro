@@ -19,8 +19,8 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
 
 
     const submitForm = (()=>{
-        if(!descricao || !valor || !tipo){
-            alert("Todos os campos são obrigatórios, preencha todos por favor.")
+        if(!valor || !tipo){
+            alert("Os campos 'valor' e 'tipo' são obrigatórios, preencha todos por favor.")
             return;
         }
 

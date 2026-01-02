@@ -3,9 +3,9 @@
 import { IoClose } from "react-icons/io5";
 import { 
   MdDashboard, 
-  MdHome, 
-  MdAssessment  
+  MdHome 
 } from "react-icons/md";
+import { FaFileExcel } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -26,10 +26,10 @@ export default function SideMenu({isOpen, onClose}) {
             active: pathname === "/dashboards" || pathname.startsWith("/dashboard/")
         },
         {
-            icon: MdAssessment,
-            label: "Gráficos",
-            href: "/charts",
-            active: false
+            icon: FaFileExcel,
+            label: "Relatórios",
+            href: "/reports",
+            active: pathname === "/reports" || pathname.startsWith("/reports/")
         }
     ];
 

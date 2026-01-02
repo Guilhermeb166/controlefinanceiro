@@ -220,8 +220,8 @@ export default function GeneralAnalysis() {
     return (
         <div className="bg-white rounded-lg py-6 px-2 shadow space-y-8">
             {/* HEADER */}
-            <div className="flex justify-between items-center flex-col sm:flex-row gap-5 sm:gap-0">
-                <h1 className="text-xl font-semibold">Análise Geral</h1>
+            <div className="flex justify-between sm:justify-around items-center flex-col sm:flex-row gap-5 sm:gap-0">
+                <h1 className="text-xl sm:text-2xl font-semibold">Análise Geral</h1>
 
                 <div className="flex gap-2">
                     {["weekly", "monthly", "yearly"].map(p => (
@@ -393,14 +393,27 @@ function CompareBar({ title, data, month, setMonth, year, setYear, barLabel = "V
                 </FormControl>
             </div>
 
-            <div className="h-[260px] pointer-events-none select-none">
+            <div className="h-[260px]  select-none">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data}>
+                    <BarChart data={data}
+                        margin={{
+
+                            right: 32,
+                            left: 0,
+
+                        }}    
+                    >
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
-                        <Tooltip formatter={v => formatCurrency(v)} />
+                        <Tooltip formatter={v => formatCurrency(v)} cursor={false}/>
                         <Bar dataKey="value" name={barLabel}>
+                            <LabelList
+                                dataKey="value"
+                                position="top"
+                                formatter={(v) => (v > 0 ? formatCurrency(v) : "")}
+                                style={{ fontSize: 15, fill: "#111827", fontWeight: 500 }}
+                            />
                             {data.map((entry) => (
                                 <Cell
                                     key={entry.name}
