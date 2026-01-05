@@ -29,7 +29,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             return
         }
 
-        if (categoria.subcategorias.length > 0 && !subcategoria) {
+        if (categoria.subcategorias.length > 0 && !subcategoria && tipo !== "outros") {
             alert("Selecione uma subcategoria.")
             return
         }

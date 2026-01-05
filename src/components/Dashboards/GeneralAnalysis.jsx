@@ -269,10 +269,12 @@ export default function GeneralAnalysis() {
             </div>
             {/* GRÁFICO PRINCIPAL */}
             {view === "main" && (
-            <div
+            <button
+                type="button"
                 ref={drag.ref}
                 onMouseDown={drag.onMouseDown}
-                className="h-80 overflow-x-auto horizontal-scroll cursor-grab active:cursor-grabbing"
+                className="h-80 overflow-x-auto horizontal-scroll cursor-grab  w-full text-left focus:outline-none"
+                aria-label="Arraste para rolar o gráfico"
             >
                 <div
                     className="h-full select-none"
@@ -318,7 +320,7 @@ export default function GeneralAnalysis() {
                         </ResponsiveContainer>
                     </div>
                 </div>
-            </div>
+            </button>
         )}
             {/* COMPARATIVO */}
             {view === "compare" && (

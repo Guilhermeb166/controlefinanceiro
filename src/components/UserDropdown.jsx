@@ -65,7 +65,7 @@ export default function UserDropdown({ user }) {
                         : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
                 }`}>
                     <div className="px-4 py-3 bg-linear-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-                        <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">Logado como</p>
+                        <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">Email Logado</p>
                         <p className="text-sm font-semibold text-gray-800 truncate select-none">
                             {user.email}
                         </p>
