@@ -240,7 +240,7 @@ export default function GeneralAnalysis() {
 
             {/* KPI */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Kpi title="Receitas" value={summary.income} color="text-emerald-600" />
+                <Kpi title="Receitas" value={summary.income} color="text-emerald-600 " />
                 <Kpi title="Despesas" value={summary.expense} color="text-red-600" />
                 <Kpi title="Saldo" value={summary.balance} color="text-blue-600" />
             </div>

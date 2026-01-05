@@ -41,7 +41,7 @@ export default function Table({ expenses }) {
 
     return (
         <>
-            <div className="flex flex-col gap-3 mt-6 md:hidden select-none">
+            <div className="flex flex-col gap-3 mt-6 lg:hidden select-none">
                 {(expenses ?? []).map(item => (
                     <div
                         key={item.id}
@@ -50,7 +50,7 @@ export default function Table({ expenses }) {
                         <div className="flex justify-between text-sm text-gray-500">
                             <span>{item.data}</span>
                             <FaTrash
-                                className="text-red-600 cursor-pointer text-lg"
+                                className="text-red-600 cursor-pointer text-2xl lg:text-lg"
                                 onClick={() => askDelete(item)}
                             />
                         </div>
@@ -62,7 +62,7 @@ export default function Table({ expenses }) {
                                 {formatCurrency(item.valor)}
                             </span>
                             <span
-                                className={`text-sm font-medium ${item.tipo === "Receita"
+                                className={`lg:text-sm text-md font-medium ${item.tipo === "Receita"
                                         ? "text-green-600"
                                         : "text-red-600"
                                     }`}
@@ -73,7 +73,7 @@ export default function Table({ expenses }) {
                     </div>
                 ))}
             </div>
-            <table className="hidden md:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2 select-none">
+            <table className="hidden lg:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2 select-none">
                 <thead>
                     <tr>
                         <th className="px-3 py-4 text-left tracking-[1px]">Data</th>
