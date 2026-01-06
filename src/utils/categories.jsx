@@ -32,6 +32,8 @@ export const CATEGORIES = [
     id: "financas",
     nome: "Despesas Financeiras & Serviços",
     subcategorias: [
+      { id: "investimentos", nome: "Aporte em Investimentos" },
+      { id: "cofrinho", nome: "Cofrinho / Reserva de Emergência" },
       { id: "emprestimo", nome: "Empréstimo / Financiamento" },
       { id: "faturaCredito", nome: "Fatura do Cartão de Crédito" },
       { id: "imposto", nome: "Impostos" },
@@ -87,7 +89,7 @@ export const CATEGORIES = [
       { id: "outraReceita", nome: "Outra Receita" },
       { id: "presente", nome: "Presente / Doação" },
       { id: "reembolso", nome: "Reembolso" },
-      { id: "investimentos", nome: "Rendimentos de Investimentos" },
+      { id: "rendimentos", nome: "Rendimentos / Resgate de Investimentos" },
       { id: "salario", nome: "Salário" },
       { id: "vendas", nome: "Vendas" },
     ]
