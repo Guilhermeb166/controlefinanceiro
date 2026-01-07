@@ -80,7 +80,7 @@ export const CATEGORIES = [
   },
   {
     id: "receitas",
-    nome: "Receitas",
+    nome: "Receitas / Lucro",
     subcategorias: [
       { id: "aluguel", nome: "Aluguel Recebido" },
       { id: "bonus", nome: "Bônus / Comissões" },
