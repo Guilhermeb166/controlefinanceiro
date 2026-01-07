@@ -57,6 +57,8 @@ export default function Table({ expenses }) {
 
                         <h3 className="font-medium">{getCategoriaLabel(item)}</h3>
 
+                        <span className="text-sm text-gray-500 tracking-wide">{item.observacao || 'Sem Observação' }</span>
+
                         <div className="flex justify-between items-center">
                             <span className="font-semibold">
                                 {formatCurrency(item.valor)}
@@ -73,7 +75,7 @@ export default function Table({ expenses }) {
                     </div>
                 ))}
             </div>
-            <table className="hidden lg:table max-w-5xl w-full mt-10 border-separate border-spacing-y-2 select-none">
+            <table className="hidden lg:table max-w-[1050px] w-full mt-10 mx-auto border-separate border-spacing-y-2 select-none ">
                 <thead>
                     <tr>
                         <th className="px-3 py-4 text-left tracking-[1px]">Data</th>
@@ -100,7 +102,7 @@ export default function Table({ expenses }) {
                                 </td>
                                 <td className="text-gray-400 pl-3 py-4 bg-white">{formatCurrency(item.valor)}</td>
                                 <td className={`text-gray-400 pl-3 py-4 bg-white ${item.tipo === 'Receita' ? 'text-green-600' : 'text-red-600'}`}>{item.tipo}</td>
-                                <td className="text-red-600 px-1 py-4 bg-white rounded-r-lg"><FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} /></td>
+                                <td className="text-red-600 lg:px-3 py-4 bg-white rounded-r-lg"><FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} /></td>
                             </tr>
                         )
                     })}

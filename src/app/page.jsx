@@ -39,21 +39,6 @@ export default function Home() {
         setAppliedFilters(filters)
     }
 
-    const summary = useMemo(() => {
-        return (expenses ?? []).reduce(
-            (acc, item) => {
-                if (item.tipo === "Receita") {
-                    acc.entradas += item.valor
-                    acc.total += item.valor
-                } else {
-                    acc.saidas += item.valor
-                    acc.total -= item.valor
-                }
-                return acc
-            },
-            { entradas: 0, saidas: 0, total: 0 }
-        )
-    }, [expenses])
 
 
     const filteredExpenses = useMemo(() => {
@@ -92,7 +77,6 @@ export default function Home() {
             })
         }
 
-
         switch (sortBy) {
             case "value-desc":
                 data.sort((a, b) => b.valor - a.valor)
@@ -118,6 +102,22 @@ export default function Home() {
 
         return data
     }, [expenses, sortBy, appliedFilters])
+
+    const summary = useMemo(() => {
+        return (filteredExpenses ?? []).reduce(
+            (acc, item) => {
+                if (item.tipo === "Receita") {
+                    acc.entradas += item.valor
+                    acc.total += item.valor
+                } else {
+                    acc.saidas += item.valor
+                    acc.total -= item.valor
+                }
+                return acc
+            },
+            { entradas: 0, saidas: 0, total: 0 }
+        )
+    }, [filteredExpenses])
 
     
 
@@ -163,7 +163,7 @@ export default function Home() {
                     
                 </div>
             </section>
-            <section className="max-w-5xl mx-auto mt-4 lg:mt-0 px-4 lg:px-0">
+            <section className="max-w-[1100px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
                 <div className="max-w-5xl mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
                     <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
                         <div className="flex justify-between items-center">
