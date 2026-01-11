@@ -5,7 +5,7 @@ import {
   MdDashboard, 
   MdHome 
 } from "react-icons/md";
-import { FaFileExcel } from "react-icons/fa6";
+import { FaCreditCard  } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -26,10 +26,10 @@ export default function SideMenu({isOpen, onClose}) {
             active: pathname === "/dashboards" || pathname.startsWith("/dashboard/")
         },
         {
-            icon: FaFileExcel,
-            label: "Relatórios",
-            href: "/reports",
-            active: pathname === "/reports" || pathname.startsWith("/reports/")
+            icon: FaCreditCard,
+            label: "Planeje seu Crédito",
+            href: "/plannedCredit",
+            active: pathname === "/plannedCredit" || pathname.startsWith("/plannedCredit/")
         }
     ];
 

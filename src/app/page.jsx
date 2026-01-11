@@ -163,7 +163,7 @@ export default function Home() {
                     
                 </div>
             </section>
-            <section className="max-w-[1100px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
+            <section className="max-w-[1000px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
                 <div className="max-w-5xl mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
                     <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
                         <div className="flex justify-between items-center">
