@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
 import Modal from 'react-modal'
-import { FormControl, InputLabel, Select, MenuIte  } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem  } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
 import { CATEGORIES } from '@/utils/categories';
 import { useRouter } from 'next/navigation'
