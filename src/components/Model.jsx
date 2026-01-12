@@ -1,14 +1,14 @@
 'use client'
 import { useState } from 'react';
 import Modal from 'react-modal'
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuIte  } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
 import { CATEGORIES } from '@/utils/categories';
-
+import { useRouter } from 'next/navigation'
 
 
 export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
-
+    const router = useRouter()
     const { addExpense } = useExpenses();
 
     const [categoria, setCategoria] = useState(null)
@@ -49,6 +49,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             ? { id: subcategoria.id, nome: subcategoria.nome }
             : null
         })
+        
         setSnackbar({
             open: true,
             message: "Transação criada com sucesso!",
@@ -58,6 +59,12 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
         setValor('')
         setTipo('')
         setIsOpen(false)
+
+        if (tipo === 'Crédito') {
+            setIsOpen(false)
+            router.push('/plannedCredit')
+            return
+        }
     })
     return (
         <Modal

@@ -2,8 +2,9 @@
 
 import Modal from 'react-modal'
 import { useEffect, useState } from 'react'
+import { IoClose } from "react-icons/io5";
 
-export default function CreditCardModal({ isOpen, onSave, card }) {
+export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
     const [bank, setBank] = useState('')
     const [creditLimit, setCreditLimit] = useState('')
     const [closingDay, setClosingDay] = useState('')
@@ -40,20 +41,23 @@ export default function CreditCardModal({ isOpen, onSave, card }) {
             className="bg-white rounded-xl p-6 w-full max-w-lg outline-none"
             overlayClassName="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
         >
-            <h2 className="text-xl font-semibold mb-4">
-                Dados do Cartão
-            </h2>
+            <div className='flex justify-between items-start relative'>
+                <h2 className="text-xl font-semibold mb-4 ">
+                    Dados do Cartão
+                </h2>
+                <span className='flex items-center justify-center'><IoClose className='text-3xl text-red-700 cursor-pointer' onClick={onClose}/></span>
+            </div>
 
             <div className="space-y-3 flex flex-wrap gap-4 justify-center">
                 <input
-                    className="input border border-gray-400 rounded-md px-3 py-2"
+                    className="outline-none input border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     placeholder="Banco"
                     value={bank}
                     onChange={e => setBank(e.target.value)}
                 />
 
                 <input
-                    className="input appearance-none border border-gray-400 rounded-md px-3 py-2"
+                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Limite total"
                     value={creditLimit}
@@ -62,7 +66,7 @@ export default function CreditCardModal({ isOpen, onSave, card }) {
 
                 <div className="flex gap-3">
                 <input
-                    className="input appearance-none border border-gray-400 rounded-md px-3 py-2"
+                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Fechamento"
                     value={closingDay}
@@ -70,7 +74,7 @@ export default function CreditCardModal({ isOpen, onSave, card }) {
                 />
 
                 <input
-                    className="input appearance-none border border-gray-400 rounded-md px-3 py-2"
+                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Vencimento"
                     value={dueDay}
@@ -81,7 +85,7 @@ export default function CreditCardModal({ isOpen, onSave, card }) {
 
             <button
                 onClick={handleSave}
-                className="mt-6 w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition"
+                className="mt-6 w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition cursor-pointer"
             >
                 Salvar
             </button>
