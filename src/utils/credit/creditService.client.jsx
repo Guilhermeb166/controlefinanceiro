@@ -1,45 +1,32 @@
-'use client'
-
-import { db } from '@/backend/firebase'
 import {
-  doc,
-  getDoc,
-  setDoc,
-  getDocs,
   collection,
-  query,
-  where,
+  addDoc,
+  getDocs,
+  updateDoc,
+  doc,
 } from 'firebase/firestore'
+import { db } from '@/backend/firebase'
 
-// Busca dados do cartão
-export async function getUserCreditCard(userId) {
-  if (!userId) return null
+export async function getUserCreditCards(userId) {
+  const snap = await getDocs(collection(db, 'users', userId, 'creditCards'))
 
-  const ref = doc(db, 'users', userId)
-  const snap = await getDoc(ref)
-
-  return snap.exists() ? snap.data().creditCard : null
+  return snap.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
 }
 
-// Salva / atualiza cartão
-export async function saveUserCreditCard(userId, data) {
-  await setDoc(
-    doc(db, 'users', userId),
-    { creditCard: data },
-    { merge: true }
-  )
-}
+export async function saveUserCreditCard(userId, data, cardId = null) {
+  if (cardId) {
+    await updateDoc(
+      doc(db, 'users', userId, 'creditCards', cardId),
+      data
+    )
+    return
+  }
 
-// Busca compras de crédito
-export async function getCreditPurchases(userId) {
-  if (!userId) return []
-
-  const q = query(
-    collection(db, 'expenses'),
-    where('userId', '==', userId),
-    where('type', '==', 'Crédito')
-  )
-
-  const snap = await getDocs(q)
-  return snap.docs.map(doc => doc.data())
+  await addDoc(collection(db, 'users', userId, 'creditCards'), {
+    ...data,
+    createdAt: new Date(),
+  })
 }

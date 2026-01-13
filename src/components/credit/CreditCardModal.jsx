@@ -12,24 +12,24 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
 
     useEffect(() => {
         if (card) {
-        setBank(card.bank)
-        setCreditLimit(card.creditLimit)
-        setClosingDay(card.closingDay)
-        setDueDay(card.dueDay)
+            setBank(card.bank)
+            setCreditLimit(card.creditLimit)
+            setClosingDay(card.closingDay)
+            setDueDay(card.dueDay)
         }
     }, [card])
 
     function handleSave() {
         if (!bank || !creditLimit || !closingDay || !dueDay) {
-        alert('Preencha todos os campos.')
-        return
+            alert('Preencha todos os campos.')
+            return
         }
 
         onSave({
-        bank,
-        creditLimit: Number(creditLimit),
-        closingDay: Number(closingDay),
-        dueDay: Number(dueDay),
+            bank,
+            creditLimit: Number(creditLimit),
+            closingDay: Number(closingDay),
+            dueDay: Number(dueDay),
         })
     }
 

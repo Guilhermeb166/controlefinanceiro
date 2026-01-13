@@ -3,16 +3,12 @@
 import { useEffect, useState } from 'react'
 import { auth } from '@/backend/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
-import {
-  getUserCreditCard,
-  getCreditPurchases,
-} from '@/utils/credit/creditService.client'
+import { getUserCreditCards } from '@/utils/credit/creditService.client'
 import CreditPlannerForm from '@/components/credit/CreditPlannerForm'
 
 export default function PlannedCreditClient() {
     const [user, setUser] = useState(null)
-    const [creditCard, setCreditCard] = useState(null)
-    const [creditPurchases, setCreditPurchases] = useState([])
+    const [creditCards, setCreditCards] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -23,12 +19,8 @@ export default function PlannedCreditClient() {
             }
 
             setUser(currentUser)
-
-            const card = await getUserCreditCard(currentUser.uid)
-            const purchases = await getCreditPurchases(currentUser.uid)
-
-            setCreditCard(card)
-            setCreditPurchases(purchases)
+            const cards = await getUserCreditCards(currentUser.uid)
+            setCreditCards(cards)
             setLoading(false)
             })
 
@@ -41,8 +33,7 @@ export default function PlannedCreditClient() {
     return (
         <CreditPlannerForm
             userId={user.uid}
-            creditCard={creditCard}
-            creditPurchases={creditPurchases}
+            creditCards={creditCards}
         />
     )
 }
