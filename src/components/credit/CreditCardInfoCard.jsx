@@ -1,7 +1,7 @@
 'use client'
 
 import { FaTrash } from "react-icons/fa"
-
+import { formatCurrency } from "@/utils/FormatCurrency"
 export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete }) {
     return (
         <div
@@ -47,7 +47,7 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                 <button
                     onClick={(e) => {
                         e.stopPropagation()
-                        onDelete(card)
+                        onDelete()
                     }}
                     className="
                         cursor-pointer
@@ -72,7 +72,7 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                         Limite Total
                     </span>
                     <span className="text-white font-semibold text-lg">
-                        R$ {card.creditLimit.toFixed(2)}
+                        {formatCurrency(card.creditLimit)}
                     </span>
                 </div>
 

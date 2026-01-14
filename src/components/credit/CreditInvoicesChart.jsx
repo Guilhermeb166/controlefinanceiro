@@ -9,6 +9,7 @@ import {
     ResponsiveContainer,
     Legend
 } from 'recharts'
+import { formatCurrency } from "@/utils/FormatCurrency"
 
 export default function CreditInvoicesChart({ invoices, creditLimit }) {
     const data = invoices.map(inv => ({
@@ -23,7 +24,7 @@ export default function CreditInvoicesChart({ invoices, creditLimit }) {
                 <BarChart data={data}>
                     <XAxis dataKey="mes" />
                     <YAxis />
-                    <Tooltip formatter={v => `R$ ${Number(v).toFixed(2)}`} />
+                    <Tooltip formatter={(value) => formatCurrency(Number(value) || 0)} />
                     <Legend />
                     <Bar dataKey="Valor da fatura" />
                     <Bar dataKey="Limite restante" />

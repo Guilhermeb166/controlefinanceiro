@@ -1,32 +1,53 @@
 import {
   collection,
   addDoc,
-  getDocs,
   updateDoc,
+  deleteDoc,
   doc,
-} from 'firebase/firestore'
-import { db } from '@/backend/firebase'
+  getDocs,
+  query,
+  where
+} from "firebase/firestore"
+import { db } from "@/backend/firebase"
 
-export async function getUserCreditCards(userId) {
-  const snap = await getDocs(collection(db, 'users', userId, 'creditCards'))
-
-  return snap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  }))
+/**
+ * Criar cartão
+ */
+export async function createCreditCard(userId, data) {
+  await addDoc(collection(db, "creditCards"), {
+    ...data,
+    userId,
+    createdAt: new Date()
+  })
 }
 
-export async function saveUserCreditCard(userId, data, cardId = null) {
-  if (cardId) {
-    await updateDoc(
-      doc(db, 'users', userId, 'creditCards', cardId),
-      data
-    )
-    return
-  }
+/**
+ * Atualizar cartão
+ */
+export async function updateCreditCard(cardId, data) {
+  await updateDoc(doc(db, "creditCards", cardId), data)
+}
 
-  await addDoc(collection(db, 'users', userId, 'creditCards'), {
-    ...data,
-    createdAt: new Date(),
-  })
+/**
+ * Excluir cartão
+ */
+export async function deleteCreditCard(cardId) {
+  await deleteDoc(doc(db, "creditCards", cardId))
+}
+
+/**
+ * Buscar cartões do usuário
+ */
+export async function getUserCreditCards(userId) {
+  const q = query(
+    collection(db, "creditCards"),
+    where("userId", "==", userId)
+  )
+
+  const snapshot = await getDocs(q)
+
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
 }

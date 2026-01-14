@@ -61,8 +61,8 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
         setIsOpen(false)
 
         if (tipo === 'Crédito') {
+            router.push(`/plannedCredit?from=expense&value=${valor}`)
             setIsOpen(false)
-            router.push('/plannedCredit')
             return
         }
     })

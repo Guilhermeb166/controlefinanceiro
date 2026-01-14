@@ -4,7 +4,12 @@ import { useMemo, useState, useEffect } from 'react'
 import { generateInvoices } from '@/utils/credit/creditCalc'
 import CreditCardModal from './CreditCardModal'
 import CreditInvoicesChart from './CreditInvoicesChart'
-import { saveUserCreditCard } from '@/utils/credit/creditService.client'
+import {
+  createCreditCard,
+  updateCreditCard,
+  deleteCreditCard,
+  getUserCreditCards
+} from "@/utils/credit/creditService.client"
 import CreditCardInfoCard from './CreditCardInfoCard'
 
 export default function CreditPlannerForm({
@@ -48,51 +53,29 @@ export default function CreditPlannerForm({
         })
     }, [selectedCard, purchaseDate, installments, installmentValue])
 
-    async function handleSaveCard(data) {
-        // edição
-        if (editingCard) {
-            await saveUserCreditCard(userId, data, editingCard.id)
-
-            const updated = cards.map(c =>
-                c.id === editingCard.id ? { ...c, ...data } : c
-            )
-
-            setCards(updated)
-            setSelectedCard(updated.find(c => c.id === editingCard.id))
-        } 
-        // novo cartão
-        else {
-            await saveUserCreditCard(userId, data)
-
-            const newCard = {
-                ...data,
-                id: crypto.randomUUID(), // apenas para UI imediata
+        async function handleSaveCard(data) {
+            if (editingCard) {
+                await updateCreditCard(editingCard.id, data)
+            } else {
+                await createCreditCard(userId, data)
             }
 
-            const updated = [...cards, newCard]
+            const refreshed = await getUserCreditCards(userId)
+            setCards(refreshed)
+            setSelectedCard(refreshed[0] || null)
 
-            setCards(updated)
-            setSelectedCard(newCard)
+            setEditingCard(null)
+            setShowModal(false)
         }
 
-        setEditingCard(null)
-        setShowModal(false)
-    }
+      
 
-    async function handleDeleteCard(cardToDelete) {
-        const updatedCards = cards.filter(c => c.id !== cardToDelete.id)
+    async function handleDeleteCard(cardId) {
+        await deleteCreditCard(cardId)
 
-        await saveUserCreditCard(userId, updatedCards)
-
-        setCards(updatedCards)
-
-        if (selectedCard?.id === cardToDelete.id) {
-            setSelectedCard(updatedCards[0] ?? null)
-        }
-
-        if (updatedCards.length === 0) {
-            setShowModal(true)
-        }
+        const refreshed = await getUserCreditCards(userId)
+        setCards(refreshed)
+        setSelectedCard(refreshed[0] || null)
     }
 
     return (
@@ -107,8 +90,9 @@ export default function CreditPlannerForm({
                                 setEditingCard(card)
                                 setShowModal(true)
                             }}
-                            onDelete={handleDeleteCard}
+                            onDelete={() => handleDeleteCard(card.id)}
                             onSelect={() => setSelectedCard(card)}
+
                         />
                     ))}
                 </div>
