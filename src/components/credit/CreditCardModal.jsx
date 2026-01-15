@@ -84,6 +84,7 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
             </div>
 
             <button
+                type='button'
                 onClick={handleSave}
                 className="mt-6 w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition cursor-pointer"
             >

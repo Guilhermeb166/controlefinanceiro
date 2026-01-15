@@ -4,7 +4,10 @@ import { FaTrash } from "react-icons/fa"
 import { formatCurrency } from "@/utils/FormatCurrency"
 export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete }) {
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: <explanation>
+        // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
         <div
+            
             onClick={onSelect}
             className="
                 cursor-pointer
@@ -25,6 +28,7 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                 </div>
 
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.stopPropagation()
                         onEdit()
@@ -45,6 +49,7 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                     Editar
                 </button>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.stopPropagation()
                         onDelete()

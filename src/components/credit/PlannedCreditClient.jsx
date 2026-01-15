@@ -1,12 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { auth } from '@/backend/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { getUserCreditCards } from '@/utils/credit/creditService.client'
 import CreditPlannerForm from '@/components/credit/CreditPlannerForm'
 
 export default function PlannedCreditClient() {
+    const searchParams = useSearchParams()
+    const fromExpense = searchParams.get('from') === 'expense'
+    const initialValue = searchParams.get('value')
     const [user, setUser] = useState(null)
     const [creditCards, setCreditCards] = useState([])
     const [loading, setLoading] = useState(true)
@@ -34,6 +38,8 @@ export default function PlannedCreditClient() {
         <CreditPlannerForm
             userId={user.uid}
             creditCards={creditCards}
+            fromExpense={fromExpense}
+            initialValue={initialValue}
         />
     )
 }
