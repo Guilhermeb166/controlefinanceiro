@@ -11,23 +11,18 @@ import {
 } from 'recharts'
 import { formatCurrency } from "@/utils/FormatCurrency"
 
-export default function CreditInvoicesChart({ invoices, creditLimit }) {
-    const data = invoices.map(inv => ({
-        mes: inv.month,
-        'Valor da fatura': inv.value,
-        'Limite restante': creditLimit - inv.value,
-    }))
+export default function CreditInvoicesChart({ invoices }) {
+
 
     return (
         <div className="h-72 mt-6">
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
-                    <XAxis dataKey="mes" />
+                <BarChart data={invoices}>
+                    <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value) => formatCurrency(Number(value) || 0)} />
+                    <Tooltip formatter={v => formatCurrency(v)} />
                     <Legend />
-                    <Bar dataKey="Valor da fatura" />
-                    <Bar dataKey="Limite restante" />
+                    <Bar dataKey="value" name="Fatura do mês" />
                 </BarChart>
             </ResponsiveContainer>
         </div>

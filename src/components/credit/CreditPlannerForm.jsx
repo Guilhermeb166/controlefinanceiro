@@ -2,21 +2,25 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import { generateInvoices } from '@/utils/credit/creditCalc'
-import {FormControl, InputLabel, Select, MenuItem} from '@mui/material'
+
 import CreditInstallmentModal from './CreditInstallmentModal'
 import CreditCardModal from './CreditCardModal'
 import CreditInvoicesChart from './CreditInvoicesChart'
-import {
-  createCreditCard,
-  updateCreditCard,
-  deleteCreditCard,
-  getUserCreditCards
-} from "@/utils/credit/creditService.client"
 import CreditCardInfoCard from './CreditCardInfoCard'
+import {
+    createCreditCard,
+    updateCreditCard,
+    deleteCreditCard,
+    getUserCreditCards
+} from "@/utils/credit/creditService.client"
+import { calculateUsedLimit } from '@/utils/credit/calculateUsedLimit'
+import { formatCurrency } from '@/utils/FormatCurrency'
+import { useExpenses } from '@/context/AppContext'
 
 export default function CreditPlannerForm({
     userId, creditCards, fromExpense, initialValue
 }) {
+    const { expenses } = useExpenses()
     const [showInstallmentModal, setShowInstallmentModal] = useState(false)
     const [cards, setCards] = useState([])
     const [selectedCard, setSelectedCard] = useState(null)
@@ -27,19 +31,6 @@ export default function CreditPlannerForm({
     const [installments, setInstallments] = useState(1)
     const [purchaseDate, setPurchaseDate] = useState('')
 
-    
-
-    
-
-    useEffect(() => {
-        if (fromExpense && cards.length > 0) {
-            setSelectedCard(cards[0])
-            setTotalValue(Number(initialValue))
-            setInstallments(1)
-            setPurchaseDate(new Date().toISOString().slice(0, 10))
-            setShowInstallmentModal(true)
-        }
-    }, [fromExpense, cards, initialValue])
 
     useEffect(() => {
         if (!creditCards || creditCards.length === 0) {
@@ -52,6 +43,16 @@ export default function CreditPlannerForm({
         setCards(creditCards)
         setSelectedCard(creditCards[0])
     }, [creditCards])
+
+    useEffect(() => {
+        if (fromExpense && cards.length > 0) {
+            setSelectedCard(cards[0])
+            setTotalValue(Number(initialValue))
+            setInstallments(1)
+            setPurchaseDate(new Date().toISOString().slice(0, 10))
+            setShowInstallmentModal(true)
+        }
+    }, [fromExpense, cards, initialValue])
 
 
     const installmentValue = useMemo(() => {
@@ -66,26 +67,26 @@ export default function CreditPlannerForm({
             purchaseDate,
             closingDay: selectedCard.closingDay,
             installments,
-            installmentValue,
+            installmentValue
         })
     }, [selectedCard, purchaseDate, installments, installmentValue])
 
-        async function handleSaveCard(data) {
-            if (editingCard) {
-                await updateCreditCard(editingCard.id, data)
-            } else {
-                await createCreditCard(userId, data)
-            }
-
-            const refreshed = await getUserCreditCards(userId)
-            setCards(refreshed)
-            setSelectedCard(refreshed[0] || null)
-
-            setEditingCard(null)
-            setShowModal(false)
+    async function handleSaveCard(data) {
+        if (editingCard) {
+            await updateCreditCard(editingCard.id, data)
+        } else {
+            await createCreditCard(userId, data)
         }
 
-      
+        const refreshed = await getUserCreditCards(userId)
+        setCards(refreshed)
+        setSelectedCard(refreshed[0] || null)
+
+        setEditingCard(null)
+        setShowModal(false)
+    }
+
+
 
     async function handleDeleteCard(cardId) {
         await deleteCreditCard(cardId)
@@ -96,26 +97,26 @@ export default function CreditPlannerForm({
     }
 
     const usedLimit = useMemo(() => {
-        if (!invoices.length) return 0
+        if (!selectedCard || !expenses) return 0
 
-        const currentMonth = new Date().getMonth()
-        const currentYear = new Date().getFullYear()
+        const now = new Date()
 
-        return invoices
-            .filter(inv => {
-            const [month, year] = inv.month.split('/')
-            return Number(month) - 1 === currentMonth && Number(year) === currentYear
-            })
-            .reduce((sum, inv) => sum + inv.value, 0)
-    }, [invoices])
+        return calculateUsedLimit({
+            expenses,
+            creditCardId: selectedCard.id,
+            month: now.getMonth(),
+            year: now.getFullYear(),
+            closingDay: selectedCard.closingDay
+        })
+    }, [expenses, selectedCard])
 
     const availableLimit = useMemo(() => {
-            if (!selectedCard) return 0
-            return selectedCard.creditLimit - usedLimit
-        }, [selectedCard, usedLimit])
+        if (!selectedCard) return 0
+        return selectedCard.creditLimit - usedLimit
+    }, [selectedCard, usedLimit])
     return (
         <div className="space-y-6">
-            
+
             {cards.length > 0 && (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {cards.map(card => (
@@ -153,17 +154,17 @@ export default function CreditPlannerForm({
             />
 
             {selectedCard && (
-                 <>
+                <>
                     <div className="bg-white p-4 border rounded-xl space-y-3">
-                    <h3 className="font-medium">
-                        Cartão selecionado: {selectedCard.bank}
-                    </h3>
+                        <h3 className="font-medium">
+                            Cartão selecionado: {selectedCard.bank}
+                        </h3>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <Info label="Limite total" value={selectedCard.creditLimit} />
-                        <Info label="Limite usado" value={usedLimit} />
-                        <Info label="Limite disponível" value={availableLimit} />
-                    </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Info label="Limite total" value={selectedCard.creditLimit} />
+                            <Info label="Limite usado" value={usedLimit} />
+                            <Info label="Limite disponível" value={availableLimit} />
+                        </div>
                     </div>
 
                     <CreditInvoicesChart
@@ -185,6 +186,18 @@ export default function CreditPlannerForm({
                 purchaseDate={purchaseDate}
                 setPurchaseDate={setPurchaseDate}
             />
+        </div>
+    )
+}
+
+
+function Info({ label, value }) {
+    return (
+        <div>
+            <p className="text-sm text-gray-500">{label}</p>
+            <p className="font-semibold">
+                {formatCurrency(value ?? 0)}
+            </p>
         </div>
     )
 }
