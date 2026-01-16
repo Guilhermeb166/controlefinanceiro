@@ -57,6 +57,8 @@ export default function Home() {
 
         if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
             data = data.filter(e => {
+                if (!e?.data) return false
+                
                 const [_, month, year] = e.data.split("/")
 
                 if (
@@ -87,16 +89,16 @@ export default function Home() {
             case "date-asc":
                 data.sort(
                     (a, b) =>
-                        new Date(a.data.split("/").reverse().join("-")) -
-                        new Date(b.data.split("/").reverse().join("-"))
+                        new Date((a.data || "").split("/").reverse().join("-")) -
+                        new Date((b.data || "").split("/").reverse().join("-"))
                 )
                 break
             case "date-desc":
             default:
                 data.sort(
                     (a, b) =>
-                        new Date(b.data.split("/").reverse().join("-")) -
-                        new Date(a.data.split("/").reverse().join("-"))
+                        new Date((b.data || "").split("/").reverse().join("-")) -
+                        new Date((a.data || "").split("/").reverse().join("-"))
                 )
         }
 

@@ -22,7 +22,16 @@ export function isSameYear(date, baseDate){
     return date.getFullYear() === baseDate.getFullYear()
 }
 
-export function parseBRDate  (dateStr) {
+export function parseBRDate (dateStr) {
+    if (!dateStr) return new Date() 
+    
     const [d, m, y] = dateStr.split("/")
+    
+ 
+    if (!d || !m || !y) {
+        console.error("Data inválida:", dateStr)
+        return new Date() 
+    }
+    
     return new Date(y, m - 1, d)
 }
