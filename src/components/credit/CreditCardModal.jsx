@@ -25,6 +25,16 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
             return
         }
 
+        if (closingDay > dueDay) {
+            alert('O dia do fechamento do cartão não pode ser depois do dia do vencimento !')
+            return
+        }
+
+        if(closingDay > 30 || dueDay > 30){
+            alert('Os dias de fechamento e vencimento não podem ser depois do dia 30!')
+            return
+        }
+
         onSave({
             bank,
             creditLimit: Number(creditLimit),

@@ -18,25 +18,27 @@ export default function SideMenu({isOpen, onClose}) {
             label: "Ínicio",
             href: "/",
             active: pathname === "/" 
+            
         },
         {
             icon: MdDashboard,
             label: "Dashboards",
             href: "/dashboards",
             active: pathname === "/dashboards" || pathname.startsWith("/dashboard/")
+            
         },
         {
             icon: FaCreditCard,
             label: "Planeje seu Crédito",
             href: "/plannedCredit",
             active: pathname === "/plannedCredit" || pathname.startsWith("/plannedCredit/")
+            
         }
     ];
 
     const handleItemClick = () => {
-        if (window.innerWidth < 768) {
             onClose()
-        }
+
     }
 
     return (

@@ -18,7 +18,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
     const [tipo, setTipo] = useState("");
 
 
-    const submitForm = (()=>{
+    const submitForm = (async()=>{
         if(!valor || !tipo){
             alert("Os campos 'valor' e 'tipo' são obrigatórios, preencha todos por favor.")
             return;
@@ -36,34 +36,39 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
 
         const data = new Date().toLocaleDateString()
         
-        addExpense({
-            observacao: descricao || "",
-            valor: Number(valor),
-            tipo,
-            data,
-            categoria: {
-            id: categoria.id,
-            nome: categoria.nome
-            },
-            subcategoria: subcategoria
-            ? { id: subcategoria.id, nome: subcategoria.nome }
-            : null
-        })
-        
-        setSnackbar({
-            open: true,
-            message: "Transação criada com sucesso!",
-            severity: "success",
-        })
-        setDescricao('')
-        setValor('')
-        setTipo('')
-        setIsOpen(false)
+         try {
+            const id = await addExpense({
+                observacao: descricao || "",
+                valor: Number(valor),
+                tipo,
+                data,
+                categoria: {
+                    id: categoria.id,
+                    nome: categoria.nome
+                },
+                subcategoria: subcategoria
+                    ? { id: subcategoria.id, nome: subcategoria.nome }
+                    : null
+            })
 
-        if (tipo === 'Crédito') {
-            router.push(`/plannedCredit?from=expense&value=${valor}`)
+            setSnackbar({
+                open: true,
+                message: "Transação criada com sucesso!",
+                severity: "success",
+            })
+            
+            setDescricao('')
+            setValor('')
+            setTipo('')
             setIsOpen(false)
-            return
+
+            if (tipo === 'Crédito') {
+                router.push(`/plannedCredit?from=expense&value=${valor}&expenseId=${id}`)
+                return
+            }
+        } catch (error) {
+            console.error("Erro ao criar transação:", error)
+            alert("Erro ao criar transação. Tente novamente.")
         }
     })
     return (

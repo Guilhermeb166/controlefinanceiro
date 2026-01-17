@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { generateInvoices } from '@/utils/credit/creditCalc'
 
 import CreditInstallmentModal from './CreditInstallmentModal'
@@ -13,63 +13,96 @@ import {
     deleteCreditCard,
     getUserCreditCards
 } from "@/utils/credit/creditService.client"
-import { calculateUsedLimit } from '@/utils/credit/calculateUsedLimit'
+import { calculateUsedLimit, calculateTotalCommittedLimit } from '@/utils/credit/calculateUsedLimit'
 import { formatCurrency } from '@/utils/FormatCurrency'
 import { useExpenses } from '@/context/AppContext'
 
 export default function CreditPlannerForm({
-    userId, creditCards, fromExpense, initialValue
+    userId, creditCards: initialCreditCards, fromExpense, initialValue, expenseId
 }) {
     const { expenses } = useExpenses()
     const [showInstallmentModal, setShowInstallmentModal] = useState(false)
-    const [cards, setCards] = useState([])
+    const [cards, setCards] = useState(initialCreditCards || [])
     const [selectedCard, setSelectedCard] = useState(null)
     const [editingCard, setEditingCard] = useState(null)
     const [showModal, setShowModal] = useState(false)
 
-    const [totalValue, setTotalValue] = useState('')
+    const [totalValue, setTotalValue] = useState(initialValue || '')
     const [installments, setInstallments] = useState(1)
-    const [purchaseDate, setPurchaseDate] = useState('')
+    const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().slice(0, 10))
 
+    const refreshCards = useCallback(async () => {
+        const refreshed = await getUserCreditCards(userId)
+        setCards(refreshed)
+        if (selectedCard) {
+            const updatedSelected = refreshed.find(c => c.id === selectedCard.id)
+            setSelectedCard(updatedSelected || refreshed[0] || null)
+        } else {
+            setSelectedCard(refreshed[0] || null)
+        }
+    }, [userId, selectedCard])
 
     useEffect(() => {
-        if (!creditCards || creditCards.length === 0) {
-            setCards([])
-            setSelectedCard(null)
+        if (initialCreditCards && initialCreditCards.length > 0) {
+            setCards(initialCreditCards)
+            setSelectedCard(initialCreditCards[0])
+        } else if (!initialCreditCards || initialCreditCards.length === 0) {
             setShowModal(true)
-            return
         }
-
-        setCards(creditCards)
-        setSelectedCard(creditCards[0])
-    }, [creditCards])
+    }, [initialCreditCards])
 
     useEffect(() => {
         if (fromExpense && cards.length > 0) {
-            setSelectedCard(cards[0])
             setTotalValue(Number(initialValue))
-            setInstallments(1)
-            setPurchaseDate(new Date().toISOString().slice(0, 10))
             setShowInstallmentModal(true)
         }
-    }, [fromExpense, cards, initialValue])
-
+    }, [fromExpense, cards.length, initialValue])
 
     const installmentValue = useMemo(() => {
         if (!totalValue || !installments) return 0
         return Number(totalValue) / Number(installments)
     }, [totalValue, installments])
 
-    const invoices = useMemo(() => {
-        if (!selectedCard || !purchaseDate) return []
+    const chartData = useMemo(() => {
+        const monthsToShow = 12
+        const data = []
+        const now = new Date()
+        
+        for (let i = 0; i < monthsToShow; i++) {
+            const targetDate = new Date(now.getFullYear(), now.getMonth() + i, 1)
+            const m = targetDate.getMonth()
+            const y = targetDate.getFullYear()
 
-        return generateInvoices({
-            purchaseDate,
-            closingDay: selectedCard.closingDay,
-            installments,
-            installmentValue
-        })
-    }, [selectedCard, purchaseDate, installments, installmentValue])
+            // 1. Fatura do Cartão Selecionado (Verde)
+            let selectedValue = 0
+            if (selectedCard) {
+                selectedValue = calculateUsedLimit({
+                    expenses,
+                    creditCard: selectedCard,
+                    month: m,
+                    year: y
+                })
+            }
+
+            // 2. Fatura Total de TODOS os cartões (Azul)
+            let totalValueAllCards = 0
+            cards.forEach(card => {
+                totalValueAllCards += calculateUsedLimit({
+                    expenses,
+                    creditCard: card,
+                    month: m,
+                    year: y
+                })
+            })
+
+            data.push({
+                month: targetDate.toLocaleString('pt-BR', { month: 'short' }).toUpperCase(),
+                selected: selectedValue,
+                totalAll: totalValueAllCards
+            })
+        }
+        return data
+    }, [selectedCard, cards, expenses])
 
     async function handleSaveCard(data) {
         if (editingCard) {
@@ -77,74 +110,78 @@ export default function CreditPlannerForm({
         } else {
             await createCreditCard(userId, data)
         }
-
-        const refreshed = await getUserCreditCards(userId)
-        setCards(refreshed)
-        setSelectedCard(refreshed[0] || null)
-
+        await refreshCards()
         setEditingCard(null)
         setShowModal(false)
     }
 
-
-
     async function handleDeleteCard(cardId) {
-        await deleteCreditCard(cardId)
-
-        const refreshed = await getUserCreditCards(userId)
-        setCards(refreshed)
-        setSelectedCard(refreshed[0] || null)
+        if (confirm("Tem certeza que deseja excluir este cartão?")) {
+            await deleteCreditCard(cardId)
+            await refreshCards()
+        }
     }
 
-    const usedLimit = useMemo(() => {
-        if (!selectedCard || !expenses) return 0
-
+    // Limite usado na fatura do mês atual
+    const currentMonthInvoice = useMemo(() => {
+        if (!selectedCard) return 0
         const now = new Date()
-
         return calculateUsedLimit({
             expenses,
-            creditCardId: selectedCard.id,
+            creditCard: selectedCard,
             month: now.getMonth(),
-            year: now.getFullYear(),
-            closingDay: selectedCard.closingDay
+            year: now.getFullYear()
         })
     }, [expenses, selectedCard])
 
+    // Limite total comprometido (todas as parcelas futuras)
+    const totalCommitted = useMemo(() => {
+        if (!selectedCard) return 0
+        return calculateTotalCommittedLimit(selectedCard)
+    }, [selectedCard])
+
     const availableLimit = useMemo(() => {
         if (!selectedCard) return 0
-        return selectedCard.creditLimit - usedLimit
-    }, [selectedCard, usedLimit])
-    return (
-        <div className="space-y-6">
+        return selectedCard.creditLimit - totalCommitted
+    }, [selectedCard, totalCommitted])
 
-            {cards.length > 0 && (
+    return (
+        <div className="space-y-6 pb-10">
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-800">Meus Cartões</h2>
+                <button
+                    type='button'
+                    onClick={() => {
+                        setEditingCard(null)
+                        setShowModal(true)
+                    }}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm font-medium"
+                >
+                    + Novo Cartão
+                </button>
+            </div>
+
+            {cards.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {cards.map(card => (
                         <CreditCardInfoCard
                             key={card.id}
                             card={card}
+                            isSelected={selectedCard?.id === card.id}
                             onEdit={() => {
                                 setEditingCard(card)
                                 setShowModal(true)
                             }}
                             onDelete={() => handleDeleteCard(card.id)}
                             onSelect={() => setSelectedCard(card)}
-
                         />
                     ))}
                 </div>
+            ) : (
+                <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <p className="text-gray-500">Nenhum cartão cadastrado.</p>
+                </div>
             )}
-
-            <button
-                type='button'
-                onClick={() => {
-                    setEditingCard(null)
-                    setShowModal(true)
-                }}
-                className="cursor-pointer w-full border-2 border-dashed border-emerald-500/40 text-emerald-400 py-4 rounded-xl hover:bg-emerald-500/10 transition"
-            >
-                + Adicionar novo cartão
-            </button>
 
             <CreditCardModal
                 isOpen={showModal}
@@ -154,25 +191,36 @@ export default function CreditPlannerForm({
             />
 
             {selectedCard && (
-                <>
-                    <div className="bg-white p-4 border rounded-xl space-y-3">
-                        <h3 className="font-medium">
-                            Cartão selecionado: {selectedCard.bank}
-                        </h3>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <Info label="Limite total" value={selectedCard.creditLimit} />
-                            <Info label="Limite usado" value={usedLimit} />
-                            <Info label="Limite disponível" value={availableLimit} />
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-800">
+                                Análise: {selectedCard.bank}
+                            </h3>
+                            <p className="text-sm text-gray-500">Resumo de faturas e limites</p>
+                        </div>
+                        
+                        <div className="flex gap-4">
+                            <Info label="Limite Total" value={selectedCard.creditLimit} color="text-blue-600" />
+                            <Info label="Fatura Atual" value={currentMonthInvoice} color="text-red-500" />
+                            <Info label="Limite Disponível" value={availableLimit} color="text-emerald-600" />
                         </div>
                     </div>
 
-                    <CreditInvoicesChart
-                        invoices={invoices}
-                        creditLimit={selectedCard.creditLimit}
-                    />
-                </>
+                    <div className="bg-gray-50 p-4 rounded-xl">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">
+                            Comparativo de Faturas (Próximos 12 meses)
+                        </h4>
+                        <CreditInvoicesChart
+                            invoices={chartData}
+                            creditLimit={selectedCard.creditLimit}
+                        />
+                    </div>
+                    
+                   
+                </div>
             )}
+
             <CreditInstallmentModal
                 isOpen={showInstallmentModal}
                 onClose={() => setShowInstallmentModal(false)}
@@ -185,17 +233,18 @@ export default function CreditPlannerForm({
                 setInstallments={setInstallments}
                 purchaseDate={purchaseDate}
                 setPurchaseDate={setPurchaseDate}
+                onSuccess={refreshCards}
+                expenseId={expenseId}
             />
         </div>
     )
 }
 
-
-function Info({ label, value }) {
+function Info({ label, value, color = "text-gray-900" }) {
     return (
-        <div>
-            <p className="text-sm text-gray-500">{label}</p>
-            <p className="font-semibold">
+        <div className="text-right md:text-left">
+            <p className="text-xs text-gray-500 font-medium uppercase">{label}</p>
+            <p className={`text-lg font-bold ${color}`}>
                 {formatCurrency(value ?? 0)}
             </p>
         </div>

@@ -11,6 +11,7 @@ export default function PlannedCreditClient() {
     const searchParams = useSearchParams()
     const fromExpense = searchParams.get('from') === 'expense'
     const initialValue = searchParams.get('value')
+    const expenseId = searchParams.get('expenseId')
     const [user, setUser] = useState(null)
     const [creditCards, setCreditCards] = useState([])
     const [loading, setLoading] = useState(true)
@@ -40,6 +41,7 @@ export default function PlannedCreditClient() {
             creditCards={creditCards}
             fromExpense={fromExpense}
             initialValue={initialValue}
+            expenseId={expenseId}
         />
     )
 }

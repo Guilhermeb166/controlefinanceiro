@@ -46,8 +46,31 @@ export async function getUserCreditCards(userId) {
 
   const snapshot = await getDocs(q)
 
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }))
+  const cards = await Promise.all(snapshot.docs.map(async (cardDoc) => {
+    const cardData = cardDoc.data();
+    const installmentsQ = collection(db, "creditCards", cardDoc.id, "installments");
+    const installmentsSnap = await getDocs(installmentsQ);
+    const parcelas = installmentsSnap.docs.map(pDoc => ({
+      id: pDoc.id,
+      ...pDoc.data()
+    }));
+
+    return {
+      id: cardDoc.id,
+      ...cardData,
+      parcelas
+    };
+  }));
+
+  return cards;
+}
+
+/**
+ * Adicionar parcelas a um cartão
+ */
+export async function addInstallment(cardId, installmentData) {
+  await addDoc(collection(db, "creditCards", cardId, "installments"), {
+    ...installmentData,
+    createdAt: new Date()
+  });
 }
