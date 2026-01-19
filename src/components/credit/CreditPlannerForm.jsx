@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, useEffect, useCallback } from 'react'
-import { generateInvoices } from '@/utils/credit/creditCalc'
+
 
 import CreditInstallmentModal from './CreditInstallmentModal'
 import CreditCardModal from './CreditCardModal'
@@ -57,11 +57,6 @@ export default function CreditPlannerForm({
             setShowInstallmentModal(true)
         }
     }, [fromExpense, cards.length, initialValue])
-
-    const installmentValue = useMemo(() => {
-        if (!totalValue || !installments) return 0
-        return Number(totalValue) / Number(installments)
-    }, [totalValue, installments])
 
     const chartData = useMemo(() => {
         const monthsToShow = 12

@@ -4,8 +4,8 @@ import { FaTrash } from "react-icons/fa"
 import { formatCurrency } from "@/utils/FormatCurrency"
 export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete }) {
     return (
-        // biome-ignore lint/a11y/noStaticElementInteractions: <explanation>
-        // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+        // biome-ignore lint/a11y/noStaticElementInteractions: <>
+        // biome-ignore lint/a11y/useKeyWithClickEvents: <>
         <div
             
             onClick={onSelect}
