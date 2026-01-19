@@ -200,10 +200,10 @@ export default function CreditPlannerForm({
                             <p className="text-sm text-gray-500">Resumo de faturas e limites</p>
                         </div>
                         
-                        <div className="flex gap-4">
-                            <Info label="Limite Total" value={selectedCard.creditLimit} color="text-blue-600" />
-                            <Info label="Fatura Atual" value={currentMonthInvoice} color="text-red-500" />
-                            <Info label="Limite Disponível" value={availableLimit} color="text-emerald-600" />
+                        <div className="flex gap-4 flex-col items-center sm:flex-row">
+                            <Info label="Limite Total" value={selectedCard.creditLimit} color="text-blue-600 flex flex-col items-center" />
+                            <Info label="Fatura Atual" value={currentMonthInvoice} color="text-red-500 flex flex-col items-center" />
+                            <Info label="Limite Disponível" value={availableLimit} color="text-emerald-600 flex flex-col items-center" />
                         </div>
                     </div>
 
