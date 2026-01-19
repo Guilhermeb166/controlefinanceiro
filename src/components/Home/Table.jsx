@@ -1,18 +1,26 @@
-import { FaTrash } from "react-icons/fa"
+import { FaEdit, FaTrash } from "react-icons/fa"
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { useState, useEffect } from "react"
+import EditModal from './EditModal';
 import { useExpenses } from "@/context/AppContext"
-
+import AppSnackbar from "../AppSnackbar";
 export default function Table({ expenses }) {
     const { removeExpense } = useExpenses()
 
     const [openPopup, setOpenPopup] = useState(false)
     const [selected, setSelected] = useState(null)
+    const [openEdit, setOpenEdit] = useState(false)
+    const [editing, setEditing] = useState(null)
 
     function askDelete(item) {
         setSelected(item)
         setOpenPopup(true)
     }
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    })
 
     async function confirmDelete() {
         if (!selected?.id) return
@@ -38,6 +46,11 @@ export default function Table({ expenses }) {
         return item.categoria?.nome || "-"
     }
 
+    function askEdit(item) {
+        setEditing(item)
+        setOpenEdit(true)
+    }
+
 
     return (
         <>
@@ -49,10 +62,17 @@ export default function Table({ expenses }) {
                     >
                         <div className="flex justify-between text-sm text-gray-500">
                             <span>{item.data}</span>
-                            <FaTrash
-                                className="text-red-600 cursor-pointer text-2xl lg:text-lg"
-                                onClick={() => askDelete(item)}
-                            />
+                            <div className="flex items-center gap-6 text-2xl lg:text-lg">
+                                <FaEdit
+                                    className=" text-blue-600 hover:text-blue-800 cursor-pointer"
+                                    onClick={() => askEdit(item)}
+                                />
+                                <FaTrash
+                                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                                    onClick={() => askDelete(item)}
+                                />
+                                
+                            </div>
                         </div>
 
                         <h3 className="font-medium">{getCategoriaLabel(item)}</h3>
@@ -75,7 +95,7 @@ export default function Table({ expenses }) {
                     </div>
                 ))}
             </div>
-            <table className="hidden lg:table max-w-[1050px] w-full mt-10 mx-auto border-separate border-spacing-y-2 select-none ">
+            <table className="hidden lg:table max-w-[1150px] w-full mt-10 mx-auto border-separate border-spacing-y-2 select-none ">
                 <thead>
                     <tr>
                         <th className="px-3 py-4 text-left tracking-[1px]">Data</th>
@@ -83,6 +103,8 @@ export default function Table({ expenses }) {
                         <th className="px-3 py-4 text-left tracking-[1px]">Observação</th>
                         <th className="px-3 py-4 text-left tracking-[1px]">Preço</th>
                         <th className="px-3 py-4 text-left tracking-[1px]">Tipo</th>
+                        <th className="px-3 py-4 text-left tracking-[1px]"></th>
+                        <th className="px-3 py-4 text-left tracking-[1px]"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -102,7 +124,9 @@ export default function Table({ expenses }) {
                                 </td>
                                 <td className="text-gray-400 pl-3 py-4 bg-white">{formatCurrency(item.valor)}</td>
                                 <td className={`text-gray-400 pl-3 py-4 bg-white ${item.tipo === 'Receita' ? 'text-green-600' : 'text-red-600'}`}>{item.tipo}</td>
+                                <td className="text-blue-600 lg:px-3 py-4 bg-white "><FaEdit className="  hover:text-blue-800 cursor-pointer text-xl" onClick={() => askEdit(item)}/></td>
                                 <td className="text-red-600 lg:px-3 py-4 bg-white rounded-r-lg"><FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} /></td>
+                                
                             </tr>
                         )
                     })}
@@ -134,6 +158,18 @@ export default function Table({ expenses }) {
                     </div>
                 </div>
             )}
+            <EditModal
+                isOpen={openEdit}
+                setIsOpen={setOpenEdit}
+                expense={editing}
+                setSnackbar={setSnackbar}
+            />
+            <AppSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+            />
         </>
     )
 }

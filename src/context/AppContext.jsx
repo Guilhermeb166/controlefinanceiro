@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { auth, db } from "@/backend/firebase"
 import { onAuthStateChanged } from "firebase/auth"
-import { addDoc, collection, deleteDoc, doc, onSnapshot, getDoc, getDocs, query, where } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, onSnapshot, getDoc, getDocs, query, where, updateDoc } from "firebase/firestore"
 
 const AppContext = createContext()
 
@@ -75,8 +75,28 @@ export function AppProvider({children}) {
         await deleteDoc(expenseRef)
     }
 
+    const updateExpense = async (id, updatedData) => {
+        if (!id) throw new Error('ID inválido')
+
+        const ref = doc(db, "users", user.uid, 'expenses', id)
+
+        await updateDoc(ref, {
+            ...updatedData,
+            updatedAt: new Date()
+        })
+
+       
+        setExpenses(prev =>
+            prev.map(item =>
+            item.id === id
+                ? { ...item, ...updatedData }
+                : item
+            )
+        )
+    }
+
     return (
-        <AppContext.Provider value ={{ expenses, addExpense, removeExpense }}>
+        <AppContext.Provider value ={{ expenses, addExpense, removeExpense, updateExpense }}>
             {children}
         </AppContext.Provider>
     )

@@ -5,7 +5,7 @@ import { useRef, useState } from "react"
 import { useExpenses } from "@/context/AppContext"
 import { processExtract } from "@/utils/scanner/processExtract"
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import AppSnackbar from "./AppSnackbar"
+import AppSnackbar from "../AppSnackbar"
 import { CATEGORIES } from '@/utils/categories';
 
 

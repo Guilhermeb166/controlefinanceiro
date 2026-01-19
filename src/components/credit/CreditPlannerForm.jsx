@@ -162,7 +162,7 @@ export default function CreditPlannerForm({
             </div>
 
             {cards.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex flex-wrap items-center gap-3 md:gap-6">
                     {cards.map(card => (
                         <CreditCardInfoCard
                             key={card.id}

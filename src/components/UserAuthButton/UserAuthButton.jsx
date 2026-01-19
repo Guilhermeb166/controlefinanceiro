@@ -3,7 +3,7 @@
 import { onAuthStateChanged } from "firebase/auth"
 import { useEffect, useState } from "react"
 import { auth } from "@/backend/firebase"
-import UserDropdown from "@/components/UserDropdown"
+import UserDropdown from "@/components/Home/UserDropdown"
 import { useAppRouter } from "@/utils/useAppRouter"
 
 export default function UserAuthButton() {

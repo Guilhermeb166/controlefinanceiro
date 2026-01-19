@@ -3,9 +3,9 @@
 import UserAuthButton from "@/components/UserAuthButton/UserAuthButton"
 import { useState, useMemo } from "react";
 
-import ImportExtract from "@/components/ImportExtract";
-import Model from "@/components/Model";
-import Table from "@/components/Table";
+import ImportExtract from "@/components/Home/ImportExtract";
+import Model from "@/components/Home/Model";
+import Table from "@/components/Home/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
 
@@ -165,8 +165,8 @@ export default function Home() {
                     
                 </div>
             </section>
-            <section className="max-w-[1000px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
-                <div className="max-w-5xl mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
+            <section className="max-w-[1150px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
+                <div className="w-full mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
                     <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
                         <div className="flex justify-between items-center">
                             <h3 className="text-2xl sm:text-3xl text-emerald-700 font-semibold">Entradas</h3>

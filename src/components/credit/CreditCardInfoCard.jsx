@@ -11,6 +11,9 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
             onClick={onSelect}
             className="
                 cursor-pointer
+                w-full
+                m-auto
+                max-w-[300px]
                 bg-linear-to-br from-slate-800 to-slate-900
                 rounded-2xl p-6 shadow-xl
                 border border-slate-700
@@ -27,48 +30,50 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                     <div className="h-1 w-12 bg-emerald-600 rounded-full"></div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onEdit()
-                    }}
-                    className="
-                        cursor-pointer
-                        text-sm text-emerald-400
-                        hover:text-emerald-300
-                        transition-colors
-                        h-8
-                        font-medium
-                        px-3 py-1.5
-                        rounded-lg
-                        bg-slate-700/50
-                        hover:bg-slate-700
-                    "
-                >
-                    Editar
-                </button>
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onDelete()
-                    }}
-                    className="
-                        cursor-pointer
-                        text-md font-medium
-                        h-8
-                        px-3 py-1.5
-                        rounded-lg
-                        bg-red-500/10
-                        text-red-400
-                        hover:bg-red-500/20
-                        hover:text-red-300
-                        transition-colors
-                    "
-                >
-                    <FaTrash />
-                </button>
+                <div className="flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit()
+                        }}
+                        className="
+                            cursor-pointer
+                            text-sm text-emerald-400
+                            hover:text-emerald-300
+                            transition-colors
+                            h-8
+                            font-medium
+                            px-3 py-1.5
+                            rounded-lg
+                            bg-slate-700/50
+                            hover:bg-slate-700
+                        "
+                    >
+                        Editar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onDelete()
+                        }}
+                        className="
+                            cursor-pointer
+                            text-md font-medium
+                            h-8
+                            px-3 py-1.5
+                            rounded-lg
+                            bg-red-500/10
+                            text-red-400
+                            hover:bg-red-500/20
+                            hover:text-red-300
+                            transition-colors
+                        "
+                    >
+                        <FaTrash />
+                    </button>
+                </div>
             </div>
 
             <div className="space-y-3 pt-2">

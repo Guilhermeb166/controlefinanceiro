@@ -4,6 +4,7 @@ import Modal from 'react-modal'
 import { FormControl, InputLabel, Select, MenuItem  } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
 import { CATEGORIES } from '@/utils/categories';
+
 import { useRouter } from 'next/navigation'
 
 
@@ -16,6 +17,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
     const [descricao, setDescricao] = useState("");
     const [valor, setValor] = useState("");
     const [tipo, setTipo] = useState("");
+    
 
 
     const submitForm = (async()=>{
@@ -71,6 +73,9 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             alert("Erro ao criar transação. Tente novamente.")
         }
     })
+
+    
+
     return (
         <Modal
             isOpen={isOpen}
@@ -82,7 +87,7 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
                 className="absolute right-2 top-1 sm:right-4 sm:top-4"
                 onClick={()=>setIsOpen(!isOpen)}
             >
-                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 cursor-pointer">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7 cursor-pointer">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
