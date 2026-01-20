@@ -7,10 +7,11 @@ import { processExtract } from "@/utils/scanner/processExtract"
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import AppSnackbar from "../AppSnackbar"
 import { CATEGORIES } from '@/utils/categories';
+import { useRouter } from 'next/navigation'
 
 
 export default function ImportExtract() {
-
+    const router = useRouter()
     const {addExpense} = useExpenses()
 
     const [categoria, setCategoria] = useState(null)
@@ -77,6 +78,13 @@ export default function ImportExtract() {
                 message: "Transações importadas com sucesso!",
                 severity: "success",
             })
+
+            
+            if (tipo === 'Crédito') {
+                router.push(`/plannedCredit?from=expense&value=${valor}&expenseId=${id}`)
+                return
+            }
+            
         } catch (err) {
             console.error(err)
             setSnackbar({

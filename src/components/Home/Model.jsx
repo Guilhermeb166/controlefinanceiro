@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from 'react-modal'
-import { FormControl, InputLabel, Select, MenuItem  } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem, TextField  } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
 import { CATEGORIES } from '@/utils/categories';
 
@@ -17,7 +17,17 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
     const [descricao, setDescricao] = useState("");
     const [valor, setValor] = useState("");
     const [tipo, setTipo] = useState("");
-    
+    const [data, setData] = useState("");
+
+    useEffect(()=>{
+        if (!isOpen){
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            setData(`${day}/${month}/${year}`);
+        }
+    }, [isOpen]);
 
 
     const submitForm = (async()=>{
@@ -92,6 +102,37 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
                 </svg>
             </button>
             <h2 className="text-2xl sm:text-3xl mb-4">Criar nova transação</h2>
+            <div className="mb-4">
+                <TextField
+                    label="Data (DD/MM/AAAA)"
+                    value={data}
+                    onChange={(e) => setData(e.target.value)}
+                    fullWidth
+                    size="small"
+                    placeholder="DD/MM/AAAA"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#009966",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            "&.Mui-focused": {
+                                color: "#009966",
+                            },
+                        },
+                    }}
+                />
+            </div>
             <div className='flex flex-col gap-5 mb-3'>
                 <FormControl fullWidth size="small" className="my-2"
                     sx={{
