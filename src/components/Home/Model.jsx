@@ -1,11 +1,15 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal'
-import { FormControl, InputLabel, Select, MenuItem, TextField  } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem  } from '@mui/material'
 import { useExpenses } from '@/context/AppContext'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CATEGORIES } from '@/utils/categories';
-
 import { useRouter } from 'next/navigation'
+import dayjs from 'dayjs'
+import 'dayjs/locale/pt-br'
 
 
 export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
@@ -19,13 +23,10 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
     const [tipo, setTipo] = useState("");
     const [data, setData] = useState("");
 
-    useEffect(()=>{
-        if (!isOpen){
-            const today = new Date();
-            const day = String(today.getDate()).padStart(2, '0');
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const year = today.getFullYear();
-            setData(`${day}/${month}/${year}`);
+    useEffect(() => {
+        if (isOpen) {
+            // Reseta para data atual quando o modal abre
+            setData(dayjs());
         }
     }, [isOpen]);
 
@@ -46,14 +47,15 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             return
         }
 
-        const data = new Date().toLocaleDateString()
-        
          try {
+
+            const dataFormatada = data.format('DD/MM/YYYY');
+
             const id = await addExpense({
                 observacao: descricao || "",
                 valor: Number(valor),
                 tipo,
-                data,
+                data: dataFormatada ,
                 categoria: {
                     id: categoria.id,
                     nome: categoria.nome
@@ -72,6 +74,9 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             setDescricao('')
             setValor('')
             setTipo('')
+            setData(dayjs())
+            setCategoria(null)
+            setSubcategoria(null)
             setIsOpen(false)
 
             if (tipo === 'Crédito') {
@@ -103,35 +108,38 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
             </button>
             <h2 className="text-2xl sm:text-3xl mb-4">Criar nova transação</h2>
             <div className="mb-4">
-                <TextField
-                    label="Data (DD/MM/AAAA)"
-                    value={data}
-                    onChange={(e) => setData(e.target.value)}
-                    fullWidth
-                    size="small"
-                    placeholder="DD/MM/AAAA"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    sx={{
-                        "& .MuiOutlinedInput-root": {
-                            "& fieldset": {
-                                borderColor: "#d1d5dc",
-                            },
-                            "&:hover fieldset": {
-                                borderColor: "#d1d5dc",
-                            },
-                            "&.Mui-focused fieldset": {
-                                borderColor: "#009966",
-                            },
-                        },
-                        "& .MuiInputLabel-root": {
-                            "&.Mui-focused": {
-                                color: "#009966",
-                            },
-                        },
-                    }}
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+                    <DatePicker
+                        label="Data da transação"
+                        value={data}
+                        onChange={(newValue) => setData(newValue)}
+                        format="DD/MM/YYYY"
+                        slotProps={{
+                            textField: {
+                                fullWidth: true,
+                                size: "small",
+                                sx: {
+                                    "& .MuiOutlinedInput-root": {
+                                        "& fieldset": {
+                                            borderColor: "#d1d5dc",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "#d1d5dc",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#009966",
+                                        },
+                                    },
+                                    "& .MuiInputLabel-root": {
+                                        "&.Mui-focused": {
+                                            color: "#009966",
+                                        },
+                                    },
+                                }
+                            }
+                        }}
+                    />
+                </LocalizationProvider>
             </div>
             <div className='flex flex-col gap-5 mb-3'>
                 <FormControl fullWidth size="small" className="my-2"
