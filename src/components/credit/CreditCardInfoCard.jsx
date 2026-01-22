@@ -13,6 +13,7 @@ export default function CreditCardInfoCard({ card, onEdit, onSelect, onDelete })
                 cursor-pointer
                 w-full
                 m-auto
+                md:m-0
                 max-w-[300px]
                 bg-linear-to-br from-slate-800 to-slate-900
                 rounded-2xl p-6 shadow-xl

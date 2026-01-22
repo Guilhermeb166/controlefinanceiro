@@ -26,7 +26,6 @@ export default function ImportExtract() {
     const [file, setFile] = useState(null)
     const [selectedType, setSelectedType] = useState(null)
     const [observacao, setObservacao] = useState("")
-
     const fileInputRef = useRef(null)
 
     async function handleImageUpload(e) {
@@ -54,14 +53,25 @@ export default function ImportExtract() {
                 alert("Selecione uma subcategoria.")
                 return
             }
+
+            const transacoes = []
+            let valorTotal = 0
+
             await processExtract(file, async (transacao) => {
                 console.log("TRANSAÇÃO DETECTADA:", transacao)
-                await addExpense({
+
+                // Armazenar transação para possível uso posterior
+                transacoes.push(transacao)
+                
+                // Acumular valor total
+                valorTotal += Number(transacao.valor)
+
+                const id = await addExpense({
                     ...transacao,
                     tipo: selectedType,
                     categoria: {
-                    id: categoria.id,
-                    nome: categoria.nome,
+                        id: categoria.id,
+                        nome: categoria.nome,
                     },
                     subcategoria: subcategoria
                     ? {
@@ -71,6 +81,11 @@ export default function ImportExtract() {
                     : null,
                     observacao: observacao || "",
                 })
+
+                if (selectedType === 'Despesa Crédito') {
+                    router.push(`/plannedCredit?from=expense&value=${valorTotal}&expenseId=${id}`)
+                    return
+                }
             })
 
             setSnackbar({
@@ -80,10 +95,7 @@ export default function ImportExtract() {
             })
 
             
-            if (tipo === 'Crédito') {
-                router.push(`/plannedCredit?from=expense&value=${valor}&expenseId=${id}`)
-                return
-            }
+            
             
         } catch (err) {
             console.error(err)

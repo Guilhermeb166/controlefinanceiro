@@ -150,14 +150,14 @@ export default function CreditPlannerForm({
                         setEditingCard(null)
                         setShowModal(true)
                     }}
-                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm font-medium"
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm font-medium  md:cursor-pointer"
                 >
                     + Novo Cartão
                 </button>
             </div>
 
             {cards.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-3 md:gap-6">
+                <div className="flex flex-wrap items-center gap-3 md:gap-6 justify-between">
                     {cards.map(card => (
                         <CreditCardInfoCard
                             key={card.id}
@@ -186,7 +186,7 @@ export default function CreditPlannerForm({
             />
 
             {selectedCard && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+                <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h3 className="text-xl font-bold text-gray-800">
