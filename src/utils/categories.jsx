@@ -9,7 +9,7 @@ export const CATEGORIES = [
       { id: "mercado", nome: "Mercado / Supermercado" },
       { id: "outraAlimentacao", nome: "Outra Despesa com Alimentação" },
       { id: "padaria", nome: "Padaria" },
-      { id: "restaurante", nome: "Restaurante" },
+      { id: "restaurante", nome: "Restaurante / Rodízio" },
     ]
   },
   {
@@ -19,7 +19,7 @@ export const CATEGORIES = [
       { id: "aluguel", nome: "Aluguel / Financiamento" },
       { id: "agua", nome: "Água" },
       { id: "condominio", nome: "Condomínio" },
-      { id: "luz", nome: "Energia Elétrica" },
+      { id: "luz", nome: "Energia" },
       { id: "gas", nome: "Gás" },
       { id: "internet", nome: "Internet" },
       { id: "manutencao", nome: "Manutenção / Reparos" },
@@ -74,8 +74,11 @@ export const CATEGORIES = [
       { id: "cinema", nome: "Cinema / Teatro" },
       { id: "festas", nome: "Festas / Bares" },
       { id: "hobbies", nome: "Hobbies" },
+      { id: "esportes", nome: "Esportes" },
       { id: "outroLazer", nome: "Outra Despesa de Lazer" },
       { id: "viagem", nome: "Viagem" },
+      { id: "hospedagem", nome: "Hospedagem" },
+      { id: "jogosDigitais", nome: "Jogos Digitais" },
     ]
   },
   {
@@ -102,7 +105,6 @@ export const CATEGORIES = [
       { id: "celular", nome: "Celular / Smartphone" },
       { id: "console", nome: "Console" },
       { id: "reparos", nome: "Consertos / Reparos" },
-      { id: "jogosDigitais", nome: "Jogos Digitais" },
       { id: "notebook", nome: "Notebook / Computador" },
       { id: "outraTecnologia", nome: "Outra Despesa com Tecnologia" },
       { id: "perifericos", nome: "Periféricos (mouse, teclado, etc.)" },
