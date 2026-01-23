@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Modal from 'react-modal'
-import { FormControl, InputLabel, Select, MenuItem, TextField, Button, CircularProgress } from '@mui/material'
+import { FormControl, InputLabel, Select, MenuItem, TextField, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { addInstallment } from '@/utils/credit/creditService.client'
 import { calculateTotalCommittedLimit } from '@/utils/credit/calculateUsedLimit'
