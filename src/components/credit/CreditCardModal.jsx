@@ -48,8 +48,8 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
             isOpen={isOpen}
             shouldCloseOnOverlayClick={false}
             shouldCloseOnEsc={false}
-            className="bg-white rounded-xl p-6 w-full max-w-lg outline-none"
-            overlayClassName="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+            className="bg-white rounded-xl p-6 w-full ml max-w-lg outline-none"
+            overlayClassName="fixed inset-0 bg-black/60 flex items-center px-3 justify-center z-50"
         >
             <div className='flex justify-between items-start relative'>
                 <h2 className="text-xl font-semibold mb-4 ">
@@ -60,23 +60,23 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
 
             <div className="space-y-3 flex flex-wrap gap-4 justify-center">
                 <input
-                    className="outline-none input border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
+                    className="outline-none w-full input border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     placeholder="Banco"
                     value={bank}
                     onChange={e => setBank(e.target.value)}
                 />
 
                 <input
-                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
+                    className="outline-none input w-full appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Limite total"
                     value={creditLimit}
                     onChange={e => setCreditLimit(e.target.value)}
                 />
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 w-full justify-around">
                 <input
-                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
+                    className="outline-none input w-full appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Fechamento"
                     value={closingDay}
@@ -84,7 +84,7 @@ export default function CreditCardModal({ isOpen, onSave, onClose, card }) {
                 />
 
                 <input
-                    className="outline-none input appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
+                    className="outline-none input w-full appearance-none border border-gray-400 rounded-md px-3 py-2 focus:shadow-xl"
                     type="number"
                     placeholder="Vencimento"
                     value={dueDay}

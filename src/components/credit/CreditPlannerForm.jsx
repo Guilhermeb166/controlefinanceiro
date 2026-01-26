@@ -142,7 +142,7 @@ export default function CreditPlannerForm({
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between flex-col md:flex-row gap-3 items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Meus Cartões</h2>
                 <button
                     type='button'
@@ -150,7 +150,7 @@ export default function CreditPlannerForm({
                         setEditingCard(null)
                         setShowModal(true)
                     }}
-                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm font-medium  md:cursor-pointer"
+                    className="bg-emerald-600 w-full max-w-65 md:max-w-32 text-white px-4 py-2.5 rounded-lg hover:bg-emerald-700 transition text-sm font-medium  md:cursor-pointer"
                 >
                     + Novo Cartão
                 </button>
