@@ -14,7 +14,7 @@ import 'dayjs/locale/pt-br'
 
 export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
     const router = useRouter()
-    const { addExpense } = useExpenses();
+    const { addExpense , creditCards} = useExpenses();
 
     const [categoria, setCategoria] = useState(null)
     const [subcategoria, setSubcategoria] = useState(null)
@@ -44,6 +44,13 @@ export default function Model({ isOpen,setIsOpen, setSnackbar  }) {
 
         if (categoria.subcategorias.length > 0 && !subcategoria && tipo !== "outros") {
             alert("Selecione uma subcategoria.")
+            return
+        }
+
+        if (tipo === 'Crédito' && (!creditCards || creditCards.length === 0)) {
+            alert("Você precisa cadastrar um cartão de crédito antes de adicionar uma despesa no crédito.")
+            router.push('/plannedCredit')
+            setIsOpen(false)
             return
         }
 

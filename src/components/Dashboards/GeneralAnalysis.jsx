@@ -22,6 +22,7 @@ import {
     MenuItem,
     Select
 } from "@mui/material"
+import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit";
 
 function useHorizontalDrag() {
     const ref = useRef(null)
@@ -64,7 +65,7 @@ function useHorizontalDrag() {
 export default function GeneralAnalysis() {
 
     const drag = useHorizontalDrag()
-    const { expenses } = useExpenses()
+    const { expenses, creditCards } = useExpenses()
 
     const [period, setPeriod] = useState("monthly")
     const [view, setView] = useState("main")
@@ -100,17 +101,34 @@ export default function GeneralAnalysis() {
         filteredExpenses.forEach(e => {
             if (e.tipo === "Receita") {
                 income += e.valor
-            } else {
+            } else if (e.tipo !== "Crédito") {
                 expense += e.valor
             }
         })
+
+        // Impacto dos cartões no período selecionado
+        let creditOutflow = 0
+        if (creditCards && creditCards.length > 0) {
+            creditCards.forEach(card => {
+                creditOutflow += calculateUsedLimit({
+                    expenses,
+                    creditCard: card,
+                    month: now.getMonth(),
+                    year: now.getFullYear()
+                })
+            })
+        }
+        
+        // Nota: O GeneralAnalysis usa 'now' para filtrar o período atual.
+        // Para simplificar, estamos calculando o outflow do mês atual.
+        expense += creditOutflow
 
         return {
             income,
             expense,
             balance: income - expense
         }
-    }, [filteredExpenses])
+    }, [filteredExpenses, creditCards, expenses, now])
 
     /* =========================
     GRÁFICO PRINCIPAL (BARRAS)

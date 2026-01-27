@@ -13,7 +13,8 @@ export default function ExpensesControls({
     filters,
     setFilters,
     onApplyFilters,
-    expenses 
+    expenses,
+    creditCards
 }) {
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -67,15 +68,16 @@ export default function ExpensesControls({
                 </div>
             </div>
             { isFilterOpen && (
-                <button
-                    type="button"
-                    aria-label="Fechar filtros"
+                <div 
                     className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
                     onClick={(e) => {
                         if (e.target === e.currentTarget) {
                             setIsFilterOpen(false)
                         }
                     }}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="filter-dialog-title"
                 >
                 <div
                     className="bg-white py-4 px-6 rounded-lg shadow-lg w-[90%] sm:w-full max-w-md border-none"
@@ -96,7 +98,7 @@ export default function ExpensesControls({
                         Cancelar
                     </button>
                 </div>
-        </button>
+        </div>
       )}
     </>
   )

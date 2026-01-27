@@ -1,4 +1,3 @@
-/** biome-ignore-all assist/source/organizeImports: <> */
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
 import { auth, db } from "@/backend/firebase"
@@ -10,6 +9,7 @@ const AppContext = createContext()
 export function AppProvider({children}) {
     const [user, setUser] = useState(null)
     const [expenses, setExpenses] = useState(null)
+    const [creditCards, setCreditCards] = useState([])
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (firebaseUser) => {
@@ -23,11 +23,27 @@ export function AppProvider({children}) {
 
         const q = collection(db, "users", user.uid, "expenses")
 
-        const unsub = onSnapshot(q, (snap) => {
-        setExpenses(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        const unsubExpenses = onSnapshot(q, (snap) => {
+            setExpenses(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
         })
 
-        return () => unsub()
+        // Buscar cartões e suas parcelas
+        const qCards = query(collection(db, "creditCards"), where("userId", "==", user.uid))
+        const unsubCards = onSnapshot(qCards, async (snap) => {
+            const cardsData = await Promise.all(snap.docs.map(async (cardDoc) => {
+                const cardData = cardDoc.data()
+                
+                const instSnap = await getDocs(collection(db, "creditCards", cardDoc.id, "installments"))
+                const parcelas = instSnap.docs.map(p => ({ id: p.id, ...p.data() }))
+                return { id: cardDoc.id, ...cardData, parcelas }
+            }))
+            setCreditCards(cardsData)
+        })
+
+        return () => {
+            unsubExpenses()
+            unsubCards()
+        }
     }, [user])
 
     async function addExpense(data) {
@@ -38,21 +54,21 @@ export function AppProvider({children}) {
             createdAt: new Date(),
         })
         
-        // Retornamos o ID do documento recém-criado no Firestore
+       
         return docRef.id
     }
 
     async function removeExpense(id) {
         if (!user?.uid) return
 
-        // 1. Buscar a despesa para ver se ela tem vínculo com cartão de crédito
+        //  Buscar a despesa para ver se ela tem vínculo com cartão de crédito
         const expenseRef = doc(db, "users", user.uid, "expenses", id)
         const expenseSnap = await getDoc(expenseRef)
         
         if (expenseSnap.exists()) {
             const expenseData = expenseSnap.data()
             
-            // 2. Se for do tipo Crédito, procurar em TODOS os cartões pela parcela vinculada a este expenseId
+            //  Se for do tipo Crédito, procurar em TODOS os cartões pela parcela vinculada a este expenseId
             if (expenseData.tipo === 'Crédito') {
                 // Como não sabemos em qual cartão está, buscamos em todos os cartões do usuário
                 const cardsQ = query(collection(db, "creditCards"), where("userId", "==", user.uid))
@@ -96,7 +112,7 @@ export function AppProvider({children}) {
     }
 
     return (
-        <AppContext.Provider value ={{ expenses, addExpense, removeExpense, updateExpense }}>
+        <AppContext.Provider value ={{ expenses, creditCards, addExpense, removeExpense, updateExpense }}>
             {children}
         </AppContext.Provider>
     )

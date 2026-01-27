@@ -1,7 +1,7 @@
 "use client"
 import {FormControl, Select, MenuItem} from '@mui/material'
 
-export default function FilterControl({ filters, setFilters, onApplyFilters  }) {
+export default function FilterControl({ filters, setFilters, onApplyFilters, creditCards  }) {
 
     const years = Array.from({ length: 6}, (_, i) =>
         new Date().getFullYear() - i
@@ -38,6 +38,36 @@ export default function FilterControl({ filters, setFilters, onApplyFilters  }) 
                             <MenuItem value="Receita">Receita</MenuItem>
                             <MenuItem value="Despesa">Despesa</MenuItem>
                             
+                        </Select>
+                    </FormControl>
+                    <FormControl size="small" fullWidth
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": {
+                                    borderColor: "#d1d5dc ", 
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "#d1d5dc ", 
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#009966 ", 
+                                },
+                            },
+                        }}
+                    >
+                        <Select
+                            value={filters.cardId || "all"}
+                            onChange={(e) =>
+                                setFilters({ ...filters, cardId: e.target.value })
+                            }
+                            displayEmpty
+                        >
+                            <MenuItem value="all">Todos os cartões</MenuItem>
+                            {creditCards?.map(card => (
+                                <MenuItem key={card.id} value={card.id}>
+                                    {card.bank} {card.cardNumber?.slice(-4)}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     {/* Mês */}

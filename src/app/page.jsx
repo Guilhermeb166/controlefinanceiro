@@ -8,7 +8,7 @@ import Model from "@/components/Home/Model";
 import Table from "@/components/Home/Table";
 import { useExpenses } from "@/context/AppContext"
 import { formatCurrency } from "@/utils/FormatCurrency";
-
+import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit";
 import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
 import AppSnackbar from "@/components/AppSnackbar";
 
@@ -16,16 +16,16 @@ import AppSnackbar from "@/components/AppSnackbar";
 
 export default function Home() {
 
-    const { expenses } = useExpenses()
+    const { expenses, creditCards } = useExpenses()
 
     const [isOpen, setIsOpen] = useState(false)
-    
     
     const [sortBy, setSortBy] = useState("date-desc")
     const [filters, setFilters] = useState({
         tipo: "all",
         month: "all",
-        year: "all"
+        year: "all",
+        cardId: "all"
     })
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -38,8 +38,6 @@ export default function Home() {
     function applyFilters() {
         setAppliedFilters(filters)
     }
-
-
 
     const filteredExpenses = useMemo(() => {
         let data = [...(expenses ?? [])]
@@ -79,6 +77,22 @@ export default function Home() {
             })
         }
 
+        if (appliedFilters.cardId !== "all") {
+            data = data.filter(e => {
+                // Se for despesa de crédito, ela pode ter o cardId direto ou via parcelas
+                if (e.tipo === "Crédito") {
+                    // Verifica se a despesa tem vínculo com o cartão selecionado
+                    // No seu sistema, a despesa principal pode não ter o cardId, mas as parcelas têm.
+                    // Vamos buscar se existe alguma parcela desse expenseId no cartão selecionado.
+                    const card = creditCards.find(c => c.id === appliedFilters.cardId)
+                    if (card && card.parcelas) {
+                        return card.parcelas.some(p => p.expenseId === e.id)
+                    }
+                }
+                return false
+            })
+        }
+
         switch (sortBy) {
             case "value-desc":
                 data.sort((a, b) => b.valor - a.valor)
@@ -106,12 +120,13 @@ export default function Home() {
     }, [expenses, sortBy, appliedFilters])
 
     const summary = useMemo(() => {
-        return (filteredExpenses ?? []).reduce(
+        const baseSummary = (filteredExpenses ?? []).reduce(
             (acc, item) => {
                 if (item.tipo === "Receita") {
                     acc.entradas += item.valor
                     acc.total += item.valor
-                } else {
+                } else if (item.tipo !== "Crédito") {
+                    // Apenas Débito/Pix e Despesa comum entram aqui
                     acc.saidas += item.valor
                     acc.total -= item.valor
                 }
@@ -119,9 +134,27 @@ export default function Home() {
             },
             { entradas: 0, saidas: 0, total: 0 }
         )
-    }, [filteredExpenses])
 
-    
+        let creditCardOutflow = 0
+        const selectedMonth = appliedFilters.month === "all" ? new Date().getMonth() : Number(appliedFilters.month) - 1
+        const selectedYear = appliedFilters.year === "all" ? new Date().getFullYear() : Number(appliedFilters.year)
+
+        if (creditCards && creditCards.length > 0) {
+            creditCards.forEach(card => {
+                creditCardOutflow += calculateUsedLimit({
+                    expenses,
+                    creditCard: card,
+                    month: selectedMonth,
+                    year: selectedYear
+                })
+            })
+        }
+
+        baseSummary.saidas += creditCardOutflow
+        baseSummary.total -= creditCardOutflow
+
+        return baseSummary
+    }, [filteredExpenses, creditCards, expenses, appliedFilters])
 
     return (
         <main className="min-h-screen bg-neutral-200 pb-30">
