@@ -51,6 +51,7 @@ export function AppProvider({children}) {
 
         const docRef = await addDoc(collection(db, "users", user.uid, "expenses"), {
             ...data,
+            observacao: data.observacao || "Sem Observação",
             createdAt: new Date(),
         })
         
@@ -96,17 +97,52 @@ export function AppProvider({children}) {
 
         const ref = doc(db, "users", user.uid, 'expenses', id)
 
+        // 1. Atualizar a despesa principal
         await updateDoc(ref, {
             ...updatedData,
             updatedAt: new Date()
         })
 
-       
+        // 2. Se for crédito, atualizar as parcelas no cartão
+        if (updatedData.tipo === 'Crédito' && updatedData.cardId) {
+            // Buscar parcelas existentes vinculadas a este expenseId
+            const installmentsQ = query(
+                collection(db, "creditCards", updatedData.cardId, "installments"),
+                where("expenseId", "==", id)
+            )
+            const installmentsSnap = await getDocs(installmentsQ)
+            
+            // Remover parcelas antigas para reinserir as novas (mais simples para lidar com mudança no número de parcelas)
+            for (const pDoc of installmentsSnap.docs) {
+                await deleteDoc(doc(db, "creditCards", updatedData.cardId, "installments", pDoc.id))
+            }
+
+            // Inserir novas parcelas baseadas nos dados atualizados
+            const totalValue = Number(updatedData.valor)
+            const installmentsCount = Number(updatedData.installments) || 1
+            const installmentValue = totalValue / installmentsCount
+            
+            // Converter data DD/MM/YYYY para YYYY-MM-DD para o Firebase
+            const [day, month, year] = updatedData.data.split('/')
+            const purchaseDate = `${year}-${month}-${day}`
+
+            await addDoc(collection(db, "creditCards", updatedData.cardId, "installments"), {
+                expenseId: id,
+                description: updatedData.observacao || "Compra no Crédito",
+                totalValue: totalValue,
+                installments: installmentsCount,
+                installmentValue: installmentValue,
+                purchaseDate: purchaseDate,
+                cardId: updatedData.cardId,
+                createdAt: new Date()
+            })
+        }
+
         setExpenses(prev =>
             prev.map(item =>
-            item.id === id
-                ? { ...item, ...updatedData }
-                : item
+                item.id === id
+                    ? { ...item, ...updatedData }
+                    : item
             )
         )
     }

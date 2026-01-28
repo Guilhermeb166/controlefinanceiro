@@ -23,8 +23,8 @@ export default function Home() {
     const [sortBy, setSortBy] = useState("date-desc")
     const [filters, setFilters] = useState({
         tipo: "all",
-        month: "all",
-        year: "all",
+        month: String(new Date().getMonth() + 1),
+        year: String(new Date().getFullYear()),
         cardId: "all"
     })
     const [snackbar, setSnackbar] = useState({
@@ -42,6 +42,60 @@ export default function Home() {
     const filteredExpenses = useMemo(() => {
         let data = [...(expenses ?? [])]
 
+        //remover as transações de crédito da lista princiapal, vai mostrar elas projetadas pela fatura
+        data = data.filter(e => e.tipo !== 'Crédito')
+
+        // Projetar e AGRUPAR parcelas de crédito por cartão
+        const projectedInstallments = []
+        const selectedMonth = appliedFilters.month === "all" ? null : Number(appliedFilters.month)
+        const selectedYear = appliedFilters.year === "all" ? null : Number(appliedFilters.year)
+
+        creditCards.forEach(card => {
+            if (appliedFilters.cardId !== "all" && card.id !== appliedFilters.cardId) return
+
+           if (card.parcelas) {
+                card.parcelas.forEach(parcela => {
+                    const [pYear, pMonth, pDay] = parcela.purchaseDate.split("-").map(Number)
+                    const purchaseDate = new Date(pYear, pMonth - 1, pDay)
+                    const closingDay = Number(card.closingDay) || 1
+
+                    for (let i = 0; i < parcela.installments; i++) {
+                        const invoiceDate = new Date(purchaseDate)
+                        invoiceDate.setMonth(invoiceDate.getMonth() + i)
+
+                        if (purchaseDate.getDate() > closingDay) {
+                            invoiceDate.setMonth(invoiceDate.getMonth() + 1)
+                        }
+
+                        const invMonth = invoiceDate.getMonth() + 1
+                        const invYear = invoiceDate.getFullYear()
+
+                        // Filtrar por mês/ano se aplicável
+                       if (selectedMonth && invMonth !== selectedMonth) continue
+                        if (selectedYear && invYear !== selectedYear) continue
+
+                        projectedInstallments.push({
+                            id: `${parcela.id}-inst-${i}`,
+                            expenseId: parcela.expenseId,
+                            data: `${String(invoiceDate.getDate()).padStart(2, '0')}/${String(invMonth).padStart(2, '0')}/${invYear}`,
+                            valor: parcela.installmentValue,
+                            tipo: "Crédito",
+                            categoria: { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                            observacao: `${parcela.description || 'Sem Observação'} (${i + 1}/${parcela.installments})`,
+                            cardId: card.id,
+                            bank: card.bank,
+                            installments: parcela.installments, // Guardar info original para edição
+                            totalValue: parcela.totalValue,
+                            purchaseDate: parcela.purchaseDate
+                        })
+                    }
+                })
+            }
+        })
+
+        // Unificar despesas comuns com as faturas agrupadas
+        data = [...data, ...projectedInstallments]
+
         if (appliedFilters.tipo !== "all") {
             if (appliedFilters.tipo === "Despesa") {
                 data = data.filter(e =>
@@ -56,42 +110,13 @@ export default function Home() {
         if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
             data = data.filter(e => {
                 if (!e?.data) return false
-                
                 const [_, month, year] = e.data.split("/")
-
-                if (
-                    appliedFilters.month !== "all" &&
-                    Number(month) !== Number(appliedFilters.month)
-                ) {
-                    return false
-                }
-
-                if (
-                    appliedFilters.year !== "all" &&
-                    Number(year) !== Number(appliedFilters.year)
-                ) {
-                    return false
-                }
-
+                if (appliedFilters.month !== "all" && Number(month) !== Number(appliedFilters.month)) return false
+                if (appliedFilters.year !== "all" && Number(year) !== Number(appliedFilters.year)) return false
                 return true
             })
         }
 
-        if (appliedFilters.cardId !== "all") {
-            data = data.filter(e => {
-                // Se for despesa de crédito, ela pode ter o cardId direto ou via parcelas
-                if (e.tipo === "Crédito") {
-                    // Verifica se a despesa tem vínculo com o cartão selecionado
-                    // No seu sistema, a despesa principal pode não ter o cardId, mas as parcelas têm.
-                    // Vamos buscar se existe alguma parcela desse expenseId no cartão selecionado.
-                    const card = creditCards.find(c => c.id === appliedFilters.cardId)
-                    if (card && card.parcelas) {
-                        return card.parcelas.some(p => p.expenseId === e.id)
-                    }
-                }
-                return false
-            })
-        }
 
         switch (sortBy) {
             case "value-desc":
@@ -101,23 +126,23 @@ export default function Home() {
                 data.sort((a, b) => a.valor - b.valor)
                 break
             case "date-asc":
-                data.sort(
-                    (a, b) =>
-                        new Date((a.data || "").split("/").reverse().join("-")) -
-                        new Date((b.data || "").split("/").reverse().join("-"))
-                )
+                data.sort((a, b) => {
+                    const dateA = new Date((a.data || "").split("/").reverse().join("-"))
+                    const dateB = new Date((b.data || "").split("/").reverse().join("-"))
+                    return dateA - dateB
+                })
                 break
             case "date-desc":
             default:
-                data.sort(
-                    (a, b) =>
-                        new Date((b.data || "").split("/").reverse().join("-")) -
-                        new Date((a.data || "").split("/").reverse().join("-"))
-                )
+                data.sort((a, b) => {
+                    const dateA = new Date((a.data || "").split("/").reverse().join("-"))
+                    const dateB = new Date((b.data || "").split("/").reverse().join("-"))
+                    return dateB - dateA
+                })
         }
 
         return data
-    }, [expenses, sortBy, appliedFilters])
+    }, [expenses, creditCards, sortBy, appliedFilters])
 
     const summary = useMemo(() => {
         const baseSummary = (filteredExpenses ?? []).reduce(
@@ -235,6 +260,7 @@ export default function Home() {
                     setFilters={setFilters}
                     onApplyFilters={applyFilters}
                     expenses={filteredExpenses}
+                    creditCards={creditCards}
                 />
                 <Table expenses={filteredExpenses} />
             </section>

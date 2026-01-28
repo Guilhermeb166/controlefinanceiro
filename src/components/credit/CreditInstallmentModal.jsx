@@ -88,13 +88,15 @@ export default function CreditInstallmentModal({
         setLoading(true)
         try {
             const installmentData = {
+                description: "Parcela do Cartão de Crédito",
                 totalValue: Number(totalValue),
                 installments: Number(installments),
                 installmentValue: Number(totalValue) / Number(installments),
                 purchaseDate: purchaseDate || new Date().toISOString().slice(0, 10),
                 cardId: selectedCard.id,
                 bank: selectedCard.bank,
-                expenseId: expenseId || null
+                expenseId: expenseId || null,
+                categoria: { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" }
             }
 
             await addInstallment(selectedCard.id, installmentData)

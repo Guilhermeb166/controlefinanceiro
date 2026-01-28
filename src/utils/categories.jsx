@@ -36,6 +36,7 @@ export const CATEGORIES = [
       { id: "cofrinho", nome: "Cofrinho / Reserva de Emergência" },
       { id: "emprestimo", nome: "Empréstimo / Financiamento" },
       { id: "faturaCredito", nome: "Fatura do Cartão de Crédito" },
+      { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
       { id: "imposto", nome: "Impostos" },
       { id: "outraFinanceira", nome: "Outra Despesa Financeira" },
       { id: "seguro", nome: "Seguros (Vida, Residência, etc.)" },

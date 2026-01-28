@@ -88,6 +88,7 @@ export default function ExpensesControls({
                         filters={filters}
                         setFilters={setFilters}
                         onApplyFilters={handleApply}
+                        creditCards={creditCards}
                     />
 
                     <button

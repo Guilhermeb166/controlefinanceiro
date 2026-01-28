@@ -23,12 +23,20 @@ export default function Table({ expenses }) {
     })
 
     async function confirmDelete() {
-        if (!selected?.id) return
-        const id = selected.id
+        if (!selected) return
+        
+        // Se for uma parcela projetada, o ID real da despesa está em expenseId
+        const idToDelete = selected.tipo === "Crédito" ? selected.expenseId : selected.id
+        
+        if (!idToDelete) {
+            alert("Não foi possível encontrar o ID da transação original para exclusão.")
+            setOpenPopup(false)
+            return
+        }
 
         setOpenPopup(false)
         setSelected(null)
-        await removeExpense(id)
+        await removeExpense(idToDelete)
     }
 
     useEffect(() => {
@@ -124,8 +132,12 @@ export default function Table({ expenses }) {
                                 </td>
                                 <td className="text-gray-400 pl-3 py-4 bg-white">{formatCurrency(item.valor)}</td>
                                 <td className={`text-gray-400 pl-3 py-4 bg-white ${item.tipo === 'Receita' ? 'text-green-600' : 'text-red-600'}`}>{item.tipo}</td>
-                                <td className="text-blue-600 lg:px-3 py-4 bg-white "><FaEdit className="  hover:text-blue-800 cursor-pointer text-xl" onClick={() => askEdit(item)}/></td>
-                                <td className="text-red-600 lg:px-3 py-4 bg-white rounded-r-lg"><FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} /></td>
+                                <td className="text-blue-600 lg:px-3 py-4 bg-white ">
+                                    <FaEdit className="  hover:text-blue-800 cursor-pointer text-xl" onClick={() => askEdit(item)}/>
+                                </td>
+                                <td className="text-red-600 lg:px-3 py-4 bg-white rounded-r-lg">
+                                    <FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} />
+                                </td>
                                 
                             </tr>
                         )

@@ -30,6 +30,7 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
     const [valor, setValor] = useState('')
     const [tipo, setTipo] = useState('')
     const [data, setData] = useState(dayjs())
+    const [installments, setInstallments] = useState(1)
 
     useEffect(() => {
         if (!isOpen || !expense) return
@@ -45,7 +46,8 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
         )
 
         setDescricao(expense.observacao || '')
-        setValor(String(expense.valor ?? ''))
+        // Se for crédito, o valor total da compra está em totalValue, senão usa o valor da linha
+        setValor(String(expense.tipo === "Crédito" ? (expense.totalValue ?? expense.valor) : (expense.valor ?? '')))
         setTipo(expense.tipo || '')
 
         setData(
@@ -62,8 +64,11 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
         }
 
         try {
-            await updateExpense(expense.id, {
-                observacao: descricao || '',
+            // Se for crédito, o ID real da despesa está em expenseId
+            const idToUpdate = expense.tipo === "Crédito" ? expense.expenseId : expense.id
+
+            await updateExpense(idToUpdate, {
+                observacao: descricao || 'Sem Observação',
                 valor: Number(valor),
                 tipo,
                 data: data.format('DD/MM/YYYY'),
@@ -72,7 +77,10 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
                     nome: categoria.nome
                 },
                 subcategoria: subcategoria
-                ? { id: subcategoria.id, nome: subcategoria.nome }: null
+                ? { id: subcategoria.id, nome: subcategoria.nome }: null,
+                // Campos específicos para crédito
+                installments: Number(installments),
+                cardId: expense.cardId
             })
         setSnackbar({
             open: true,
@@ -183,6 +191,27 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
                     setValor(raw)
                 }}
             />
+
+            {/* PARCELAS (Apenas se for crédito) */}
+            {tipo === "Crédito" && (
+                <FormControl fullWidth size="small" className="mt-4">
+                    <InputLabel>Número de Parcelas</InputLabel>
+                    <Select
+                        value={installments}
+                        label="Número de Parcelas"
+                        onChange={e => setInstallments(Number(e.target.value))}
+                    >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 24].map(n => (
+                            <MenuItem key={n} value={n}>
+                                {n}x de {((Number(valor) || 0) / n).toLocaleString('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                })}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
 
             <button
                 type="button"
