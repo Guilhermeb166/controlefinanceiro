@@ -55,9 +55,9 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
         setInstallments(expense.installments || 1)
 
         setData(
-            expense.data
-            ? dayjs(expense.data, 'DD/MM/YYYY', true)
-            : dayjs()
+            expense.purchaseDate
+            ? dayjs(expense.purchaseDate)
+            : (expense.data ? dayjs(expense.data, 'DD/MM/YYYY', true) : dayjs())
         )
     }, [isOpen, expense])
 

@@ -22,7 +22,7 @@ import {
     MenuItem,
     Select
 } from "@mui/material"
-import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit";
+//import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit";
 
 function useHorizontalDrag() {
     const ref = useRef(null)
@@ -78,8 +78,43 @@ export default function GeneralAnalysis() {
 
     const now = new Date()
 
+    const projectedExpenses = useMemo(() => {
+        const data = [...(expenses ?? [])].filter(e => e.tipo !== 'Crédito')
+
+        creditCards.forEach(card => {
+            if (card.parcelas) {
+                card.parcelas.forEach(parcela => {
+                    const [pYear, pMonth, pDay] = parcela.purchaseDate.split("-").map(Number)
+                    const purchaseDate = new Date(pYear, pMonth - 1, pDay)
+                    const closingDay = Number(card.closingDay) || 1
+
+                    for (let i = 0; i < parcela.installments; i++) {
+                        const invoiceDate = new Date(purchaseDate)
+                        invoiceDate.setMonth(invoiceDate.getMonth() + i)
+
+                        if (purchaseDate.getDate() > closingDay) {
+                            invoiceDate.setMonth(invoiceDate.getMonth() + 1)
+                        }
+
+                        const invMonth = invoiceDate.getMonth() + 1
+                        const invYear = invoiceDate.getFullYear()
+
+                        data.push({
+                            id: `${parcela.id}-inst-${i}`,
+                            data: `${String(invoiceDate.getDate()).padStart(2, '0')}/${String(invMonth).padStart(2, '0')}/${invYear}`,
+                            valor: parcela.installmentValue,
+                            tipo: "Crédito",
+                            categoria: parcela.categoria || { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                        })
+                    }
+                })
+            }
+        })
+        return data
+    }, [expenses, creditCards])
+
     const filteredExpenses = useMemo(() => {
-        return expenses.filter(e => {
+        return projectedExpenses.filter(e => {
             if (!e.data) return false
             const date = parseBRDate(e.data)
 
@@ -89,7 +124,7 @@ export default function GeneralAnalysis() {
 
             return true
         })
-    }, [expenses, period, now])
+    }, [projectedExpenses, period, now])
 
     /* =========================
      KPIs
@@ -101,34 +136,17 @@ export default function GeneralAnalysis() {
         filteredExpenses.forEach(e => {
             if (e.tipo === "Receita") {
                 income += e.valor
-            } else if (e.tipo !== "Crédito") {
+            } else {
                 expense += e.valor
             }
         })
-
-        // Impacto dos cartões no período selecionado
-        let creditOutflow = 0
-        if (creditCards && creditCards.length > 0) {
-            creditCards.forEach(card => {
-                creditOutflow += calculateUsedLimit({
-                    expenses,
-                    creditCard: card,
-                    month: now.getMonth(),
-                    year: now.getFullYear()
-                })
-            })
-        }
-        
-        // Nota: O GeneralAnalysis usa 'now' para filtrar o período atual.
-        // Para simplificar, estamos calculando o outflow do mês atual.
-        expense += creditOutflow
 
         return {
             income,
             expense,
             balance: income - expense
         }
-    }, [filteredExpenses, creditCards, expenses, now])
+    }, [filteredExpenses])
 
     /* =========================
     GRÁFICO PRINCIPAL (BARRAS)
@@ -137,7 +155,7 @@ export default function GeneralAnalysis() {
         if (period === "weekly") {
             const map = Object.fromEntries(WEEK_DAYS.map(d => [d, { income: 0, expense: 0 }]))
 
-            expenses.forEach(e => {
+            projectedExpenses.forEach(e => {
                 const date = parseBRDate(e.data)
                 if (isSameWeek(date, now)) {
                     const index = (date.getDay() + 6) % 7
@@ -162,7 +180,7 @@ export default function GeneralAnalysis() {
                 map[m] = { income: 0, expense: 0 }
             })
 
-            expenses.forEach(e => {
+            projectedExpenses.forEach(e => {
                 const date = parseBRDate(e.data)
                 if (date.getFullYear() === now.getFullYear()) {
                     const m = date.getMonth()
@@ -188,7 +206,7 @@ export default function GeneralAnalysis() {
             map[y] = { income: 0, expense: 0 }
         })
 
-        expenses.forEach(e => {
+        projectedExpenses.forEach(e => {
             const date = parseBRDate(e.data)
             if (map[date.getFullYear()]) {
                 if (e.tipo === "Receita") {
@@ -201,7 +219,7 @@ export default function GeneralAnalysis() {
         })
 
         return years.reverse().map(y => ({ name: y, ...map[y] }))
-    }, [expenses, period, now])
+    }, [projectedExpenses, period, now])
 
     /* =========================
         DADOS GRÁFICOS BARRAS
@@ -210,7 +228,7 @@ export default function GeneralAnalysis() {
         let income = 0
         let expense = 0
 
-        expenses.forEach(e => {
+        projectedExpenses.forEach(e => {
             const date = parseBRDate(e.data)
             if (date.getMonth() === month && date.getFullYear() === year) {
                 if (e.tipo === "Receita") {
@@ -225,7 +243,7 @@ export default function GeneralAnalysis() {
             { name: "Receitas", value: income },
             { name: "Despesas", value: expense }
         ]
-    }, [expenses])
+    }, [projectedExpenses])
 
     const leftBarData = useMemo(() => buildBarData(leftMonth, leftYear),
         [buildBarData, leftMonth, leftYear]

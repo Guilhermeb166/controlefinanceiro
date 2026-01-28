@@ -94,7 +94,7 @@ export default function FilterControl({ filters, setFilters, onApplyFilters, cre
                                 }
                                 displayEmpty
                             >
-                                <MenuItem value="all">Mês</MenuItem>
+                                <MenuItem value="all">Todos os Meses</MenuItem>
                                 {Array.from({ length: 12 }, (_, i) => (
                                     <MenuItem key={i++} value={i + 1}>
                                     {String(i + 1).padStart(2, "0")}
@@ -125,7 +125,7 @@ export default function FilterControl({ filters, setFilters, onApplyFilters, cre
                                 }
                                 displayEmpty
                             >
-                                <MenuItem value="all">Ano</MenuItem>
+                                <MenuItem value="all">Todos os Anos</MenuItem>
                                 {years.map(year => (
                                     <MenuItem key={year} value={year}>
                                     {year}

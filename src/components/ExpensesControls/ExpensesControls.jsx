@@ -68,6 +68,7 @@ export default function ExpensesControls({
                 </div>
             </div>
             { isFilterOpen && (
+                // biome-ignore lint/a11y/useKeyWithClickEvents: <>
                 <div 
                     className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
                     onClick={(e) => {

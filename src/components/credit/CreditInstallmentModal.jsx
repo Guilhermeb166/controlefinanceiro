@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import Modal from 'react-modal'
 import { FormControl, InputLabel, Select, MenuItem, TextField, CircularProgress } from '@mui/material'
-import { useRouter } from 'next/navigation'
 import { addInstallment } from '@/utils/credit/creditService.client'
 import { calculateTotalCommittedLimit } from '@/utils/credit/calculateUsedLimit'
 import { useExpenses } from '@/context/AppContext'
@@ -23,7 +22,7 @@ export default function CreditInstallmentModal({
     onSuccess,
     expenseId
 }) {
-    //const router = useRouter()
+   
     const { removeExpense, expenses } = useExpenses()
     const [loading, setLoading] = useState(false)
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' })

@@ -41,7 +41,7 @@ function generateColorMap(items) {
 }
 
 function adjustLightness(hex, percent) {
-  let num = parseInt(hex.replace("#", ""), 16)
+  const num = parseInt(hex.replace("#", ""), 16)
   let r = (num >> 16) + percent
   let g = ((num >> 8) & 0x00ff) + percent
   let b = (num & 0x0000ff) + percent
@@ -57,8 +57,74 @@ export default function CategoryAnalysis() {
     const theme = useTheme()
     const isDesktop = useMediaQuery(theme.breakpoints.up("sm"))
 
-    const { expenses } = useExpenses()
+    const { expenses, creditCards } = useExpenses()
     const [selectedCategory, setSelectedCategory] = useState("")
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+
+    const months = [
+        { value: 1, label: "Janeiro" },
+        { value: 2, label: "Fevereiro" },
+        { value: 3, label: "Março" },
+        { value: 4, label: "Abril" },
+        { value: 5, label: "Maio" },
+        { value: 6, label: "Junho" },
+        { value: 7, label: "Julho" },
+        { value: 8, label: "Agosto" },
+        { value: 9, label: "Setembro" },
+        { value: 10, label: "Outubro" },
+        { value: 11, label: "Novembro" },
+        { value: 12, label: "Dezembro" },
+    ]
+
+    const years = useMemo(() => {
+        const currentYear = new Date().getFullYear()
+        return Array.from({ length: 5 }, (_, i) => currentYear - 2 + i)
+    }, [])
+
+    const projectedExpenses = useMemo(() => {
+        const data = [...(expenses ?? [])].filter(e => e.tipo !== 'Crédito')
+
+        creditCards.forEach(card => {
+            if (card.parcelas) {
+                card.parcelas.forEach(parcela => {
+                    const [pYear, pMonth, pDay] = parcela.purchaseDate.split("-").map(Number)
+                    const purchaseDate = new Date(pYear, pMonth - 1, pDay)
+                    const closingDay = Number(card.closingDay) || 1
+
+                    for (let i = 0; i < parcela.installments; i++) {
+                        const invoiceDate = new Date(purchaseDate)
+                        invoiceDate.setMonth(invoiceDate.getMonth() + i)
+
+                        if (purchaseDate.getDate() > closingDay) {
+                            invoiceDate.setMonth(invoiceDate.getMonth() + 1)
+                        }
+
+                        const invMonth = invoiceDate.getMonth() + 1
+                        const invYear = invoiceDate.getFullYear()
+
+                        data.push({
+                            id: `${parcela.id}-inst-${i}`,
+                            data: `${String(invoiceDate.getDate()).padStart(2, '0')}/${String(invMonth).padStart(2, '0')}/${invYear}`,
+                            valor: parcela.installmentValue,
+                            tipo: "Crédito",
+                            categoria: parcela.categoria || { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                            subcategoria: parcela.subcategoria || null
+                        })
+                    }
+                })
+            }
+        })
+        return data
+    }, [expenses, creditCards])
+
+    const filteredByDate = useMemo(() => {
+        return projectedExpenses.filter(e => {
+            if (!e.data) return false
+            const [_, month, year] = e.data.split("/").map(Number)
+            return month === selectedMonth && year === selectedYear && e.tipo !== "Receita"
+        })
+    }, [projectedExpenses, selectedMonth, selectedYear])
 
     /* =======================
        CATEGORIAS
@@ -66,7 +132,7 @@ export default function CategoryAnalysis() {
     const categoriesData = useMemo(() => {
         const map = {}
 
-        expenses?.forEach(e => {
+        filteredByDate?.forEach(e => {
             const categoryName = e.categoria?.nome
             if (!categoryName) return
 
@@ -77,7 +143,7 @@ export default function CategoryAnalysis() {
         const total = data.reduce((sum, item) => sum + item.value, 0)
 
         return data.map(item => ({ ...item, total }))
-    }, [expenses])
+    }, [filteredByDate])
 
     const categoryColors = useMemo(
         () => generateColorMap(categoriesData),
@@ -92,7 +158,7 @@ export default function CategoryAnalysis() {
 
         const map = {}
 
-        expenses
+        filteredByDate
             ?.filter(e => e.categoria?.nome === selectedCategory)
             .forEach(e => {
                 const subName = e.subcategoria?.nome
@@ -105,7 +171,7 @@ export default function CategoryAnalysis() {
         const total = data.reduce((sum, item) => sum + item.value, 0)
 
         return data.map(item => ({ ...item, total }))
-    }, [expenses, selectedCategory])
+    }, [filteredByDate, selectedCategory])
 
     const subcategoryColors = useMemo(
         () => generateColorMap(subcategoriesData),
@@ -116,19 +182,59 @@ export default function CategoryAnalysis() {
         <div className="bg-white rounded-lg p-6 shadow space-y-6 flex flex-col gap-6">
             <h2 className="text-xl font-semibold">Categorias e Gastos</h2>
 
-            <TextField
-                select
-                label="Categoria"
-                className="max-w-100"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-                {categoriesData.map(cat => (
-                    <MenuItem key={cat.name} value={cat.name}>
-                        {cat.name}
-                    </MenuItem>
-                ))}
-            </TextField>
+            <div className="flex flex-wrap gap-4">
+                <TextField
+                    select
+                    label="Mês"
+                    size="small"
+                    className="w-40"
+                    value={selectedMonth}
+                    onChange={(e) => {
+                        setSelectedMonth(e.target.value)
+                        setSelectedCategory("")
+                    }}
+                >
+                    {months.map(m => (
+                        <MenuItem key={m.value} value={m.value}>
+                            {m.label}
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    select
+                    label="Ano"
+                    size="small"
+                    className="w-32"
+                    value={selectedYear}
+                    onChange={(e) => {
+                        setSelectedYear(e.target.value)
+                        setSelectedCategory("")
+                    }}
+                >
+                    {years.map(y => (
+                        <MenuItem key={y} value={y}>
+                            {y}
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    select
+                    label="Categoria"
+                    size="small"
+                    className="w-60"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                    <MenuItem value="">Todas as Categorias</MenuItem>
+                    {categoriesData.map(cat => (
+                        <MenuItem key={cat.name} value={cat.name}>
+                            {cat.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            </div>
 
             <div className="flex flex-col lg:flex-row h-[1200px] sm:h-[700px] lg:h-[350px] gap-30 sm:gap-0">
                 
