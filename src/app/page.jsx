@@ -74,14 +74,19 @@ export default function Home() {
                        if (selectedMonth && invMonth !== selectedMonth) continue
                         if (selectedYear && invYear !== selectedYear) continue
 
+                        // Limpar observação de duplicatas do contador de parcelas
+                        let cleanDescription = parcela.description || 'Sem Observação';
+                        cleanDescription = cleanDescription.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+
                         projectedInstallments.push({
                             id: `${parcela.id}-inst-${i}`,
                             expenseId: parcela.expenseId,
                             data: `${String(invoiceDate.getDate()).padStart(2, '0')}/${String(invMonth).padStart(2, '0')}/${invYear}`,
                             valor: parcela.installmentValue,
                             tipo: "Crédito",
-                            categoria: { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
-                            observacao: `${parcela.description || 'Sem Observação'} (${i + 1}/${parcela.installments})`,
+                            categoria: parcela.categoria || { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                            subcategoria: parcela.subcategoria || null,
+                            observacao: `${cleanDescription} (${i + 1}/${parcela.installments})`,
                             cardId: card.id,
                             bank: card.bank,
                             installments: parcela.installments, // Guardar info original para edição

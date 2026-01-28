@@ -1,5 +1,6 @@
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
+//import { useRouter } from "next/navigation"
 import { auth, db } from "@/backend/firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { addDoc, collection, deleteDoc, doc, onSnapshot, getDoc, getDocs, query, where, updateDoc } from "firebase/firestore"
@@ -10,10 +11,11 @@ export function AppProvider({children}) {
     const [user, setUser] = useState(null)
     const [expenses, setExpenses] = useState(null)
     const [creditCards, setCreditCards] = useState([])
+    //const router = useRouter()
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-        setUser(firebaseUser)
+            setUser(firebaseUser)
         })
         return () => unsub()
     }, [])
@@ -21,30 +23,76 @@ export function AppProvider({children}) {
     useEffect(() => {
         if (!user?.uid) return
 
-        const q = collection(db, "users", user.uid, "expenses")
-
-        const unsubExpenses = onSnapshot(q, (snap) => {
+        // Listener para despesas principais
+        const qExpenses = collection(db, "users", user.uid, "expenses")
+        const unsubExpenses = onSnapshot(qExpenses, (snap) => {
             setExpenses(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
         })
 
-        // Buscar cartões e suas parcelas
+        // Listener para cartões de crédito e suas subcoleções de parcelas
         const qCards = query(collection(db, "creditCards"), where("userId", "==", user.uid))
-        const unsubCards = onSnapshot(qCards, async (snap) => {
-            const cardsData = await Promise.all(snap.docs.map(async (cardDoc) => {
-                const cardData = cardDoc.data()
+        
+        // Mapa para guardar os unsubscribes das parcelas de cada cartão
+        const installmentUnsubs = {}
+
+        const unsubCards = onSnapshot(qCards, (cardsSnap) => {
+            const cardsBaseData = cardsSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), parcelas: [] }))
+            
+            // Para cada cartão, vamos ouvir a subcoleção de parcelas em tempo real
+            cardsSnap.docs.forEach(cardDoc => {
+                const cardId = cardDoc.id
                 
-                const instSnap = await getDocs(collection(db, "creditCards", cardDoc.id, "installments"))
-                const parcelas = instSnap.docs.map(p => ({ id: p.id, ...p.data() }))
-                return { id: cardDoc.id, ...cardData, parcelas }
-            }))
-            setCreditCards(cardsData)
+                // Se já temos um listener para este cartão, não criamos outro
+                if (!installmentUnsubs[cardId]) {
+                    const qInstallments = collection(db, "creditCards", cardId, "installments")
+                    installmentUnsubs[cardId] = onSnapshot(qInstallments, (instSnap) => {
+                        const parcelas = instSnap.docs.map(p => ({ id: p.id, ...p.data() }))
+                        
+                        setCreditCards(prevCards => 
+                            prevCards.map(c => 
+                                c.id === cardId ? { ...c, parcelas } : c
+                            )
+                        )
+                    })
+                }
+            })
+
+            // Limpar listeners de cartões que foram deletados
+            Object.keys(installmentUnsubs).forEach(id => {
+                if (!cardsSnap.docs.find(d => d.id === id)) {
+                    installmentUnsubs[id]()
+                    delete installmentUnsubs[id]
+                }
+            })
+
+            setCreditCards(prev => {
+                // Preservar as parcelas que já temos nos novos dados dos cartões
+                return cardsBaseData.map(newCard => {
+                    const existingCard = prev.find(c => c.id === newCard.id)
+                    return {
+                        ...newCard,
+                        parcelas: existingCard ? existingCard.parcelas : []
+                    }
+                })
+            })
         })
 
         return () => {
             unsubExpenses()
             unsubCards()
+            // biome-ignore lint/suspicious/useIterableCallbackReturn: <>
+            Object.values(installmentUnsubs).forEach(unsub => unsub())
         }
     }, [user])
+
+     // Função para forçar atualização da página
+   /* const refreshData = () => {
+        router.refresh()
+        
+        setTimeout(() => {
+            window.location.reload()
+        }, 500)
+    }*/
 
     async function addExpense(data) {
         if (!user?.uid) throw new Error("Usuário não autenticado")
@@ -54,24 +102,25 @@ export function AppProvider({children}) {
             observacao: data.observacao || "Sem Observação",
             createdAt: new Date(),
         })
+
+        // Se não for crédito, recarrega logo. Se for crédito, o modal de parcelas cuidará disso.
+       /* if (data.tipo !== 'Crédito') {
+            refreshData()
+        }*/
         
-       
         return docRef.id
     }
 
     async function removeExpense(id) {
         if (!user?.uid) return
 
-        //  Buscar a despesa para ver se ela tem vínculo com cartão de crédito
         const expenseRef = doc(db, "users", user.uid, "expenses", id)
         const expenseSnap = await getDoc(expenseRef)
         
         if (expenseSnap.exists()) {
             const expenseData = expenseSnap.data()
             
-            //  Se for do tipo Crédito, procurar em TODOS os cartões pela parcela vinculada a este expenseId
             if (expenseData.tipo === 'Crédito') {
-                // Como não sabemos em qual cartão está, buscamos em todos os cartões do usuário
                 const cardsQ = query(collection(db, "creditCards"), where("userId", "==", user.uid))
                 const cardsSnap = await getDocs(cardsQ)
                 
@@ -88,8 +137,8 @@ export function AppProvider({children}) {
             }
         }
 
-        // 3. Excluir a despesa principal
         await deleteDoc(expenseRef)
+       // refreshData()
     }
 
     const updateExpense = async (id, updatedData) => {
@@ -97,32 +146,26 @@ export function AppProvider({children}) {
 
         const ref = doc(db, "users", user.uid, 'expenses', id)
 
-        // 1. Atualizar a despesa principal
         await updateDoc(ref, {
             ...updatedData,
             updatedAt: new Date()
         })
 
-        // 2. Se for crédito, atualizar as parcelas no cartão
         if (updatedData.tipo === 'Crédito' && updatedData.cardId) {
-            // Buscar parcelas existentes vinculadas a este expenseId
             const installmentsQ = query(
                 collection(db, "creditCards", updatedData.cardId, "installments"),
                 where("expenseId", "==", id)
             )
             const installmentsSnap = await getDocs(installmentsQ)
             
-            // Remover parcelas antigas para reinserir as novas (mais simples para lidar com mudança no número de parcelas)
             for (const pDoc of installmentsSnap.docs) {
                 await deleteDoc(doc(db, "creditCards", updatedData.cardId, "installments", pDoc.id))
             }
 
-            // Inserir novas parcelas baseadas nos dados atualizados
             const totalValue = Number(updatedData.valor)
             const installmentsCount = Number(updatedData.installments) || 1
             const installmentValue = totalValue / installmentsCount
             
-            // Converter data DD/MM/YYYY para YYYY-MM-DD para o Firebase
             const [day, month, year] = updatedData.data.split('/')
             const purchaseDate = `${year}-${month}-${day}`
 
@@ -134,17 +177,13 @@ export function AppProvider({children}) {
                 installmentValue: installmentValue,
                 purchaseDate: purchaseDate,
                 cardId: updatedData.cardId,
+                categoria: updatedData.categoria || { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                subcategoria: updatedData.subcategoria || null,
                 createdAt: new Date()
             })
         }
-
-        setExpenses(prev =>
-            prev.map(item =>
-                item.id === id
-                    ? { ...item, ...updatedData }
-                    : item
-            )
-        )
+        
+        //refreshData()
     }
 
     return (

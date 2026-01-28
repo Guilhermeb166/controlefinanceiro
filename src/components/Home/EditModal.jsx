@@ -45,10 +45,14 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
             : null
         )
 
-        setDescricao(expense.observacao || '')
+        // Limpar o contador de parcelas (ex: " (1/2)") da observação ao editar
+        const cleanDesc = (expense.observacao || '').replace(/\s*\(\d+\/\d+\)\s*$/, '');
+        setDescricao(cleanDesc)
+        
         // Se for crédito, o valor total da compra está em totalValue, senão usa o valor da linha
         setValor(String(expense.tipo === "Crédito" ? (expense.totalValue ?? expense.valor) : (expense.valor ?? '')))
         setTipo(expense.tipo || '')
+        setInstallments(expense.installments || 1)
 
         setData(
             expense.data

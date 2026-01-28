@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import EditModal from './EditModal';
 import { useExpenses } from "@/context/AppContext"
 import AppSnackbar from "../AppSnackbar";
+
 export default function Table({ expenses }) {
     const { removeExpense } = useExpenses()
 
@@ -29,14 +30,32 @@ export default function Table({ expenses }) {
         const idToDelete = selected.tipo === "Crédito" ? selected.expenseId : selected.id
         
         if (!idToDelete) {
-            alert("Não foi possível encontrar o ID da transação original para exclusão.")
+            setSnackbar({
+                open: true,
+                message: "Não foi possível encontrar o ID da transação original para exclusão.",
+                severity: "error"
+            })
             setOpenPopup(false)
             return
         }
 
-        setOpenPopup(false)
-        setSelected(null)
-        await removeExpense(idToDelete)
+        try {
+            setOpenPopup(false)
+            setSelected(null)
+            await removeExpense(idToDelete)
+            setSnackbar({
+                open: true,
+                message: "Transação excluída com sucesso!",
+                severity: "success"
+            })
+        } catch (error) {
+            console.error("Erro ao excluir:", error)
+            setSnackbar({
+                open: true,
+                message: "Erro ao excluir transação.",
+                severity: "error"
+            })
+        }
     }
 
     useEffect(() => {

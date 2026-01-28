@@ -23,8 +23,8 @@ export default function CreditInstallmentModal({
     onSuccess,
     expenseId
 }) {
-    const router = useRouter()
-    const { removeExpense } = useExpenses()
+    //const router = useRouter()
+    const { removeExpense, expenses } = useExpenses()
     const [loading, setLoading] = useState(false)
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' })
 
@@ -73,9 +73,8 @@ export default function CreditInstallmentModal({
                         severity: 'error' 
                     })
                     setTimeout(() => {
-                        router.replace('/')
-                        onClose()
-                    }, 3000)
+                        window.location.href = '/'
+                    }, 2000)
                 } catch (error) {
                     console.error("Erro ao cancelar transação:", error)
                 } finally {
@@ -87,6 +86,9 @@ export default function CreditInstallmentModal({
 
         setLoading(true)
         try {
+            // Buscar a despesa original para pegar a categoria
+            const originalExpense = expenses?.find(e => e.id === expenseId)
+            
             const installmentData = {
                 description: "Parcela do Cartão de Crédito",
                 totalValue: Number(totalValue),
@@ -96,7 +98,8 @@ export default function CreditInstallmentModal({
                 cardId: selectedCard.id,
                 bank: selectedCard.bank,
                 expenseId: expenseId || null,
-                categoria: { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" }
+                categoria: originalExpense?.categoria || { id: "parcelaCredito", nome: "Parcela do Cartão de Crédito" },
+                subcategoria: originalExpense?.subcategoria || null
             }
 
             await addInstallment(selectedCard.id, installmentData)
@@ -104,7 +107,9 @@ export default function CreditInstallmentModal({
             if (onSuccess) {
                 await onSuccess()
             }
-            router.replace('/plannedCredit')
+            
+            // Forçar redirecionamento com reload para garantir que a tabela veja os novos dados
+            window.location.href = '/'
             onClose()
         } catch (error) {
             console.error("Erro ao salvar parcelas:", error)
