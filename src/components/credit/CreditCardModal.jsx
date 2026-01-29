@@ -1,3 +1,6 @@
+/**
+ * Modal para cadastrar ou editar as informações de um cartão de crédito.
+ */
 'use client'
 
 import Modal from 'react-modal'

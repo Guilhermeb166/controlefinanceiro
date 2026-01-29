@@ -1,3 +1,7 @@
+/**
+ * Página de Política de Privacidade.
+ * Informa ao usuário sobre como seus dados são coletados, usados e protegidos.
+ */
 import { FaChartPie, FaCheckCircle, FaCogs, FaEnvelope, FaEye, FaShieldAlt, FaUserShield } from "react-icons/fa";
 
 export default function PrivacyPolicy() {

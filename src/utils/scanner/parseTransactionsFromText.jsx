@@ -1,3 +1,6 @@
+/**
+ * Analisador sintático (parser) que identifica transações em blocos de texto, extraindo datas e valores.
+ */
 export function parseTransactionsFromText(text, onTransaction) {
   const linhas = text
     .normalize("NFD")
@@ -45,9 +48,10 @@ export function parseTransactionsFromText(text, onTransaction) {
       )
 
       if (m) {
-        let [, d, mesRaw, ano] = m
+        const [, d, mesRaw, ano] = m
 
-        let mes = isNaN(mesRaw)
+        // biome-ignore lint/suspicious/noGlobalIsNan: <>
+        const mes = isNaN(mesRaw)
           ? meses[mesRaw.toLowerCase()]
           : mesRaw
 

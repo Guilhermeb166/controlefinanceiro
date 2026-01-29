@@ -1,4 +1,6 @@
-// firebase.js
+/**
+ * Configuração e inicialização do Firebase para autenticação e banco de dados Firestore.
+ */
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";

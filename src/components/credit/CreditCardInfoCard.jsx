@@ -1,3 +1,6 @@
+/**
+ * Cartão visual que exibe informações resumidas de um cartão de crédito, como banco, limite e datas.
+ */
 'use client'
 
 import { FaTrash } from "react-icons/fa"

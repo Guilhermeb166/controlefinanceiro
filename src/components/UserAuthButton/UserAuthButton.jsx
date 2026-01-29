@@ -1,5 +1,7 @@
+/**
+ * Botão de autenticação que alterna entre o botão de login e o dropdown do usuário logado.
+ */
 'use client'
-
 import { onAuthStateChanged } from "firebase/auth"
 import { useEffect, useState } from "react"
 import { auth } from "@/backend/firebase"

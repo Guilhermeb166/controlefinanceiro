@@ -1,3 +1,6 @@
+/**
+ * Hook customizado para facilitar a navegação entre as páginas da aplicação.
+ */
 "use client"
 import { useRouter } from "next/navigation"
 

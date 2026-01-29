@@ -1,3 +1,6 @@
+/**
+ * Utilitário para extrair texto de imagens usando OCR (Tesseract.js) e identificar data e valor.
+ */
 import Tesseract from "tesseract.js"
 
 export async function extractFromImage(image, callback) {

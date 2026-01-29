@@ -1,3 +1,6 @@
+/**
+ * Utilitário para extrair o conteúdo de texto de arquivos PDF digitais usando pdfjs-dist.
+ */
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js"

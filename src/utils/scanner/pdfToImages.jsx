@@ -1,3 +1,6 @@
+/**
+ * Utilitário para converter páginas de um PDF em imagens (Data URLs) para processamento via OCR.
+ */
 import { PDFDocument } from "pdf-lib"
 
 export async function pdfToImages(file) {

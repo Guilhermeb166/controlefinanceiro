@@ -1,3 +1,6 @@
+/**
+ * Componente de análise geral financeira, exibindo KPIs e gráficos de barras para receitas e despesas em diferentes períodos.
+ */
 'use client'
 
 import { useState, useMemo, useCallback, useRef } from "react"

@@ -1,3 +1,6 @@
+/**
+ * Modal para criação de novas transações (Receita, Despesa ou Crédito).
+ */
 'use client'
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal'

@@ -1,3 +1,6 @@
+/**
+ * Componente cliente para a página de planejamento de crédito, lidando com autenticação e carregamento inicial de cartões.
+ */
 'use client'
 
 import { useEffect, useState } from 'react'

@@ -1,3 +1,6 @@
+/**
+ * Contexto global da aplicação que gerencia o estado de autenticação, despesas e cartões de crédito.
+ */
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
 //import { useRouter } from "next/navigation"

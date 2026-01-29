@@ -1,3 +1,6 @@
+/**
+ * Componente de análise de gastos por categoria e subcategoria, utilizando gráficos de pizza.
+ */
 'use client'
 
 import { useState, useMemo } from "react"

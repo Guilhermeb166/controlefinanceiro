@@ -1,3 +1,6 @@
+/**
+ * Modal para edição de transações existentes, permitindo alterar data, categoria, valor e observação.
+ */
 'use client'
 import { useEffect, useState } from "react"
 import Modal from 'react-modal'

@@ -1,3 +1,6 @@
+/**
+ * Menu lateral de navegação (Sidebar) que contém links para as principais seções do sistema.
+ */
 "use client"
 
 import { IoClose } from "react-icons/io5";

@@ -1,3 +1,6 @@
+/**
+ * Serviços de CRUD para cartões de crédito e parcelamentos no Firestore.
+ */
 import {
   collection,
   addDoc,

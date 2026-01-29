@@ -1,5 +1,8 @@
-import AuthLoader from "@/components/AuthLoader";
+/**
+ * Layout raiz da aplicação que define a estrutura HTML básica e envolve os filhos com provedores.
+ */
 import "./globals.css";
+import AuthLoader from "@/components/AuthLoader";
 import Providers from "./providers";
 import Footer from "@/components/Footer/Footer";
 import Header from "@/components/Header/Header";

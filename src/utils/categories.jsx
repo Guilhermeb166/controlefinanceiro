@@ -1,3 +1,6 @@
+/**
+ * Definição das categorias e subcategorias de despesas e receitas utilizadas no sistema.
+ */
 export const CATEGORIES = [
   {
     id: "alimentacao",

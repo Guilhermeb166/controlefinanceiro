@@ -1,10 +1,12 @@
-
+/**
+ * Componente de navegação secundário, atualmente focado na exibição do status de autenticação do usuário.
+ */
 
 import { useState } from "react";
 import { useAppRouter } from "@/utils/useAppRouter"
-import AppSnackbar from "@/components/AppSnackbar";
 
 export default function Nav() {
+    // biome-ignore lint/correctness/noUnusedVariables: <>
     const [user, setUser] = useState(null)
     const router = useAppRouter()
     

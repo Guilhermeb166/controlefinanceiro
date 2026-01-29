@@ -1,4 +1,9 @@
-import { FaChartBar, FaChartPie, FaEdit, FaEnvelope, FaInfoCircle, FaLightbulb, FaList, FaMinus, FaPlus, FaQuestionCircle, FaSignInAlt, FaTrash, FaUserPlus } from "react-icons/fa";
+/**
+ * Página de Instruções de Uso (Server Component).
+ * Fornece um guia completo sobre como utilizar as funcionalidades do sistema.
+ */
+import { FaChartBar, FaChartPie, FaEdit, FaEnvelope, FaInfoCircle, FaLightbulb, FaList, FaMinus, FaPlus,
+    FaQuestionCircle, FaRegCreditCard, FaSignInAlt, FaTrash, FaUserPlus } from "react-icons/fa";
 
 export default function HowToUse() {
     return (
@@ -80,7 +85,7 @@ export default function HowToUse() {
                             <div className="flex items-start gap-3">
                                 <span className="shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">1</span>
                                 <div>
-                                    <h4 className="font-semibold text-gray-800 mb-1">Clique no botão "Adicionar Receita"</h4>
+                                    <h4 className="font-semibold text-gray-800 mb-1">Clique no botão "Adicionar Transação"</h4>
                                     <p className="text-gray-600 text-sm">Localizado no painel principal do sistema</p>
                                 </div>
                             </div>
@@ -89,10 +94,10 @@ export default function HowToUse() {
                                 <div>
                                     <h4 className="font-semibold text-gray-800 mb-1">Preencha os dados</h4>
                                     <ul className="text-gray-600 text-sm space-y-1 ml-4">
-                                        <li>• <strong>Descrição:</strong> Ex: "Salário de Dezembro", "Venda de produto"</li>
+                                        <li>• <strong>Observação:</strong> Ex: "Salário de Dezembro", "Venda de produto"</li>
                                         <li>• <strong>Valor:</strong> Quanto você recebeu</li>
                                         <li>• <strong>Data:</strong> Quando você recebeu</li>
-                                        <li>• <strong>Categoria:</strong> Escolha ou crie uma (Salário, Freelance, Vendas, etc.)</li>
+                                        <li>• <strong>Categoria e Subcategoria:</strong> Escolha uma (Salário, Freelance, Vendas, etc.)</li>
                                     </ul>
                                 </div>
                             </div>
@@ -134,7 +139,7 @@ export default function HowToUse() {
                             <div className="flex items-start gap-3">
                                 <span className="shrink-0 w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold text-sm">1</span>
                                 <div>
-                                    <h4 className="font-semibold text-gray-800 mb-1">Clique no botão "Adicionar Despesa"</h4>
+                                    <h4 className="font-semibold text-gray-800 mb-1">Clique no botão "Adicionar Transação"</h4>
                                     <p className="text-gray-600 text-sm">Disponível no painel principal</p>
                                 </div>
                             </div>
@@ -143,10 +148,10 @@ export default function HowToUse() {
                                 <div>
                                     <h4 className="font-semibold text-gray-800 mb-1">Preencha os dados</h4>
                                     <ul className="text-gray-600 text-sm space-y-1 ml-4">
-                                        <li>• <strong>Descrição:</strong> Ex: "Conta de luz", "Supermercado", "Gasolina"</li>
+                                        <li>• <strong>Observação:</strong> Ex: "Conta de luz", "Supermercado", "Gasolina"</li>
                                         <li>• <strong>Valor:</strong> Quanto você gastou</li>
                                         <li>• <strong>Data:</strong> Quando você fez o gasto</li>
-                                        <li>• <strong>Categoria:</strong> Escolha ou crie uma (Alimentação, Transporte, Moradia, etc.)</li>
+                                        <li>• <strong>Categoria e Subcategoria:</strong> Escolha uma (Alimentação, Transporte, Moradia, etc.)</li>
                                     </ul>
                                 </div>
                             </div>
@@ -180,14 +185,14 @@ export default function HowToUse() {
 
                         <p className="text-gray-600 mb-6 leading-relaxed">
                             Categorias ajudam você a entender para onde seu dinheiro está indo e de onde ele vem. 
-                            O sistema já vem com categorias padrão, mas você pode criar suas próprias!
+                            O sistema já vem com categorias e subcategorias padrão!
                         </p>
 
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="bg-emerald-50 rounded-lg p-5 border border-emerald-200">
                                 <h3 className="font-bold text-emerald-700 mb-3 flex items-center gap-2">
                                     <FaPlus className="w-5 h-5" />
-                                    Categorias de Receita
+                                    Exemplos de Categorias de Receita
                                 </h3>
                                 <ul className="text-sm text-gray-700 space-y-2">
                                     <li className="flex items-center gap-2">
@@ -200,7 +205,7 @@ export default function HowToUse() {
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                        Investimentos
+                                        Comissões
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -216,7 +221,7 @@ export default function HowToUse() {
                             <div className="bg-red-50 rounded-lg p-5 border border-red-200">
                                 <h3 className="font-bold text-red-700 mb-3 flex items-center gap-2">
                                     <FaMinus className="w-5 h-5" />
-                                    Categorias de Despesa
+                                    Exemplos de Categorias de Despesa
                                 </h3>
                                 <ul className="text-sm text-gray-700 space-y-2">
                                     <li className="flex items-center gap-2">
@@ -229,11 +234,11 @@ export default function HowToUse() {
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                        Moradia
+                                        Contas de casa
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                        Saúde
+                                        Tecnologia
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
@@ -243,7 +248,7 @@ export default function HowToUse() {
                             </div>
                         </div>
 
-                        <div className="mt-6 bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        {/*<div className="mt-6 bg-purple-50 rounded-lg p-4 border border-purple-200">
                             <h4 className="font-semibold text-purple-800 mb-2 flex items-center gap-2">
                                 <FaPlus className="w-5 h-5" />
                                 Criar Categoria Personalizada
@@ -251,7 +256,7 @@ export default function HowToUse() {
                             <p className="text-sm text-gray-700">
                                 Ao registrar uma receita ou despesa, você pode criar uma nova categoria digitando o nome desejado no campo de categoria.
                             </p>
-                        </div>
+                        </div>*/}
                     </div>
                 </section>
 
@@ -304,7 +309,22 @@ export default function HowToUse() {
                                 <div className="flex-1">
                                     <h3 className="text-xl font-bold text-gray-800 mb-2">Gráficos e Relatórios</h3>
                                     <p className="text-gray-600 leading-relaxed">
-                                        Visualize gráficos que mostram a distribuição dos seus gastos por categoria, evolução do saldo ao longo do tempo e comparações entre receitas e despesas.
+                                        Visualize gráficos que mostram a distribuição dos seus gastos por categoria e subcategorias na tela de Dashboards, evolução do saldo ao longo do tempo e comparações entre receitas e despesas.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="shrink-0">
+                                    <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                        <FaRegCreditCard className="w-6 h-6 text-indigo-600" />
+
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-2">Controle de Crédito</h3>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        Controle os gastos dos seus cartões de Crédito na tela de planejamento de crédito, lá você pode ver os valores de suas faturas futuras até 12 meses e de qual cartão é cada fatura.
                                     </p>
                                 </div>
                             </div>

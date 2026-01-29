@@ -1,3 +1,6 @@
+/**
+ * Formulário de registro para novos usuários, criando perfil no Firebase Auth e documento no Firestore.
+ */
 "use client"
 
 // biome-ignore assist/source/organizeImports: <>

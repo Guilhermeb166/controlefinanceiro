@@ -1,3 +1,6 @@
+/**
+ * Componente para importação de extratos bancários via arquivo (PDF ou Imagem), com processamento automático de transações.
+ */
 "use client"
 
 import { useRef, useState } from "react"

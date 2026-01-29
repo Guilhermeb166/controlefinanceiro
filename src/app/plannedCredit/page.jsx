@@ -1,3 +1,7 @@
+/**
+ * Página de Planejamento de Crédito.
+ * Permite ao usuário planejar compras no cartão de crédito.
+ */
 import PlannedCreditClient from '@/components/credit/PlannedCreditClient'
 
 export default function PlannedCreditPage() {

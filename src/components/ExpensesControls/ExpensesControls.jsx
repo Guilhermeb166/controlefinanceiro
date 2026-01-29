@@ -1,3 +1,6 @@
+/**
+ * Componente que agrupa os controles de ordenação, filtragem e exportação de despesas.
+ */
 "use client"
 
 import { useState } from "react"

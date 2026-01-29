@@ -1,4 +1,8 @@
+/**
+ * Componente de seleção para ordenação das transações (por data ou valor).
+ */
 "use client"
+
 import { FormControl, Select, MenuItem } from "@mui/material"
 
 export default function SortControl({ sortBy, setSortBy }) {

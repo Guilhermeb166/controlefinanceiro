@@ -1,3 +1,6 @@
+/**
+ * Menu suspenso do usuário que exibe o email logado e fornece a opção de logout.
+ */
 "use client"
 
 import { signOut } from "firebase/auth"

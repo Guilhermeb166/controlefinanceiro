@@ -1,3 +1,6 @@
+/**
+ * Componente de legenda customizada para dispositivos móveis, exibindo cores e porcentagens.
+ */
 export function MobileLegend({ data, colors }) {
     const total = data.reduce((sum, item) => sum + item.value, 0)
 

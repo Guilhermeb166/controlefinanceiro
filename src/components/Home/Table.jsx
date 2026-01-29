@@ -1,3 +1,7 @@
+/**
+ * Tabela de exibição das transações filtradas, permitindo edição e exclusão.
+ */
+
 import { FaEdit, FaTrash } from "react-icons/fa"
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { useState, useEffect } from "react"

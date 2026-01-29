@@ -1,3 +1,7 @@
+/**
+ * Página de Dashboards (Server Component).
+ * Exibe análises gerais e por categoria das despesas do usuário.
+ */
 import CategoryAnalysis from "@/components/Dashboards/CategoryAnalysis";
 import GeneralAnalysis from "@/components/Dashboards/GeneralAnalysis";
 

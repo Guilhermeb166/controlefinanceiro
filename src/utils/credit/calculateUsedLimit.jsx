@@ -1,3 +1,6 @@
+/**
+ * Funções utilitárias para calcular o limite utilizado e comprometido dos cartões de crédito.
+ */
 export function calculateUsedLimit({
     expenses = [],
     creditCard,

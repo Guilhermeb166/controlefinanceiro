@@ -1,3 +1,6 @@
+/**
+ * Modal para configurar o parcelamento de uma compra no cartão de crédito, incluindo seleção de cartão e data.
+ */
 'use client'
 import { useState } from 'react'
 import Modal from 'react-modal'

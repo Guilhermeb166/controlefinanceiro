@@ -1,3 +1,6 @@
+/**
+ * Formulário principal de planejamento de crédito que gerencia cartões, exibe gráficos de faturas e lida com parcelamentos.
+ */
 'use client'
 
 import { useMemo, useState, useEffect, useCallback } from 'react'

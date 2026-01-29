@@ -1,3 +1,6 @@
+/**
+ * Utilitário para exportar a lista de transações para um arquivo Excel (.xlsx).
+ */
 import ExcelJS from "exceljs"
 import { saveAs } from "file-saver"
 

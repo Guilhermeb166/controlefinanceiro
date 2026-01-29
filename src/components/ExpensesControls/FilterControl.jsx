@@ -1,4 +1,8 @@
+/**
+ * Componente de formulário para seleção de filtros de transações (tipo, cartão, mês e ano).
+ */
 "use client"
+
 import {FormControl, Select, MenuItem} from '@mui/material'
 
 export default function FilterControl({ filters, setFilters, onApplyFilters, creditCards  }) {

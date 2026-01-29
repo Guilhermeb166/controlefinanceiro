@@ -1,3 +1,6 @@
+/**
+ * Lógica principal para processar arquivos de extrato (PDF ou Imagem) e extrair transações.
+ */
 import { extractFromImage } from "./extractFromImage"
 import { extractFromPdfText } from "./extractFromPdfText"
 import { pdfToImages } from "./pdfToImages"

@@ -1,3 +1,6 @@
+/**
+ * Formulário de login que permite ao usuário autenticar-se com email e senha via Firebase.
+ */
 "use client"
 import { useState } from "react"
 import { signInWithEmailAndPassword } from "firebase/auth"

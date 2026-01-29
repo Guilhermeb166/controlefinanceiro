@@ -1,3 +1,6 @@
+/**
+ * Componente responsável por gerenciar o estado de carregamento inicial da autenticação e dos dados do usuário.
+ */
 "use client"
 import { useEffect, useState } from "react"
 import { onAuthStateChanged } from "firebase/auth"

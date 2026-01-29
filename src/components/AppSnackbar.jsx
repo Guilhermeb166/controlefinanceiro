@@ -1,3 +1,6 @@
+/**
+ * Componente de notificação (Snackbar) global para exibir mensagens de sucesso, erro ou alerta.
+ */
 "use client"
 import { Snackbar, Alert } from "@mui/material"
 

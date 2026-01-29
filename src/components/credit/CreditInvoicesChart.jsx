@@ -1,6 +1,9 @@
+/**
+ * Gráfico de barras que compara as faturas mensais do cartão selecionado com o total de todos os cartões.
+ */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState  } from 'react'
 import {
     BarChart,
     Bar,

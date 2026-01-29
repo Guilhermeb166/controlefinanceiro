@@ -1,3 +1,6 @@
+/**
+ * Funções auxiliares para manipulação e comparação de datas nos dashboards.
+ */
 //semanal
 export function isSameWeek(date, baseDate){
     const start = new Date(baseDate)

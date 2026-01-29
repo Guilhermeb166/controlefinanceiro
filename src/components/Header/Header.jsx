@@ -1,3 +1,6 @@
+/**
+ * Componente de cabeçalho que gerencia a exibição do menu lateral e o botão de autenticação do usuário.
+ */
 "use client"
 
 import SideMenu from "@/components/SideMenu/SideMenu";

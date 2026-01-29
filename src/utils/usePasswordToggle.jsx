@@ -1,3 +1,6 @@
+/**
+ * Hook customizado para alternar a visibilidade de campos de senha (mostrar/esconder).
+ */
 import { useState } from "react"
 
 export function usePasswordToggle() {
