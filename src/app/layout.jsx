@@ -12,7 +12,7 @@ export const metadata = {
   title: "Meu Controle Financeiro",
   description: "Meu Controle Financeiro Web",
   verification: {
-    google: 'xGt8WcvHeYWP0Mtze0TBYReJTGC5M1bFFPbyLudUM0MS',
+    google: 'xGt8WcvHeYWP0Mtze0TBYReJTGC5M1bFFPbyLudUM0M',
   }
 };
 
