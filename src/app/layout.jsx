@@ -9,8 +9,11 @@ import Header from "@/components/Header/Header";
 
 
 export const metadata = {
-  title: "Minhas Despesas",
-  description: "Controle financeiro",
+  title: "Meu Controle Financeiro",
+  description: "Meu Controle Financeiro Web",
+  verification: {
+    google: 'xGt8WcvHeYWP0Mtze0TBYReJTGC5M1bFFPbyLudUM0MS',
+  }
 };
 
 export default function RootLayout({ children }) {
