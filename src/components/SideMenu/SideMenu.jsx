@@ -9,6 +9,7 @@ import {
   MdHome 
 } from "react-icons/md";
 import { FaCreditCard  } from "react-icons/fa6";
+import { BsPiggyBankFill } from "react-icons/bs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -36,6 +37,12 @@ export default function SideMenu({isOpen, onClose}) {
             href: "/plannedCredit",
             active: pathname === "/plannedCredit" || pathname.startsWith("/plannedCredit/")
             
+        },
+        {
+            icon: BsPiggyBankFill,
+            label:"Cofrinho",
+            href: "/piggyBank",
+            active: pathname === "/piggyBank" || pathname.startsWith("/piggyBank/")
         }
     ];
 

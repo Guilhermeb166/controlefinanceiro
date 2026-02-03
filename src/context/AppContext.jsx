@@ -14,7 +14,7 @@ export function AppProvider({children}) {
     const [user, setUser] = useState(null)
     const [expenses, setExpenses] = useState(null)
     const [creditCards, setCreditCards] = useState([])
-    //const router = useRouter()
+    const [piggyBank, setPiggyBank] = useState(null)
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (firebaseUser) => {
@@ -80,22 +80,21 @@ export function AppProvider({children}) {
             })
         })
 
+        //listener para transações do cofrinho
+        const qPiggyBank =  collection(db, "users", user.uid, "piggyBank")
+        const unsubPiggyBank =  onSnapshot(qPiggyBank, (snap) => {
+            setPiggyBank(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+        })
+
         return () => {
             unsubExpenses()
             unsubCards()
+            unsubPiggyBank()
             // biome-ignore lint/suspicious/useIterableCallbackReturn: <>
             Object.values(installmentUnsubs).forEach(unsub => unsub())
         }
     }, [user])
 
-     // Função para forçar atualização da página
-   /* const refreshData = () => {
-        router.refresh()
-        
-        setTimeout(() => {
-            window.location.reload()
-        }, 500)
-    }*/
 
     async function addExpense(data) {
         if (!user?.uid) throw new Error("Usuário não autenticado")
@@ -105,11 +104,6 @@ export function AppProvider({children}) {
             observacao: data.observacao || "Sem Observação",
             createdAt: new Date(),
         })
-
-        // Se não for crédito, recarrega logo. Se for crédito, o modal de parcelas cuidará disso.
-       /* if (data.tipo !== 'Crédito') {
-            refreshData()
-        }*/
         
         return docRef.id
     }
@@ -185,13 +179,52 @@ export function AppProvider({children}) {
                 createdAt: new Date()
             })
         }
+    }
+
+    // Funções para gerenciar o cofrinho (piggyBank)
+    async function addPiggyBankTransaction(data){
+        if(!user.uid) throw new Error ("usuário não autenticado")
+
+        const docRef = await addDoc(collection(db, "users", user.uid, "piggyBank"), {
+            ...data,
+            observação: data.observacao || "Transação do Cofrinho",
+            createdAt: new Date(),
+        })
+
+        return docRef.id
+    }
+
+    async function removePiggyBankTransaction(id){
+        if (!user?.uid) return
+
+        const piggyBankRef = doc(db, "users", user.uid, "piggyBank", id)
+        await deleteDoc(piggyBankRef)
+    }
+
+    async function updatePiggyBankTransaction(id, updatedData) {
+        if (!id) throw new Error ('ID inválido')
         
-        //refreshData()
+        const ref = doc(db, "users", user.uid, "piggybank", id)
+
+        await updateDoc(ref, {
+            ...updatedData,
+            updatedAt: new Data()
+        })
     }
 
     return (
-        <AppContext.Provider value ={{ expenses, creditCards, addExpense, removeExpense, updateExpense }}>
-            {children}
+        <AppContext.Provider value ={{ 
+                expenses, 
+                creditCards, 
+                piggyBank,
+                addExpense, 
+                removeExpense, 
+                updateExpense,
+                addPiggyBankTransaction,
+                removePiggyBankTransaction,
+                updatePiggyBankTransaction
+            }}>
+                {children}
         </AppContext.Provider>
     )
 }
