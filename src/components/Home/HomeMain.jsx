@@ -1,60 +1,46 @@
 /**
- * Componente principal da página inicial que gerencia o estado das despesas,
- * filtros e modais de transação.
+ * Componente principal da página inicial com design dark moderno
  */
 'use client'
 
 import UserAuthButton from "@/components/UserAuthButton/UserAuthButton"
-import { useState, useMemo } from "react";
-
-import ImportExtract from "@/components/Home/ImportExtract";
-import Model from "@/components/Home/Model";
-import Table from "@/components/Home/Table";
+import { useState, useMemo } from "react"
+import ImportExtract from "@/components/Home/ImportExtract"
+import Model from "@/components/Home/Model"
 import { useExpenses } from "@/context/AppContext"
-import { formatCurrency } from "@/utils/FormatCurrency";
-import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit";
-import ExpensesControls from "@/components/ExpensesControls/ExpensesControls";
-import AppSnackbar from "@/components/AppSnackbar";
+import { calculateUsedLimit } from "@/utils/credit/calculateUsedLimit"
+import AppSnackbar from "@/components/AppSnackbar"
+import DashboardCards from "./DashboardCards"
+import CashflowChart from "./CashflowChart"
+import RecentTransactions from "./RecentTransactions"
+import { Plus } from 'lucide-react'
 
 export default function HomeMain() {
     const { expenses, creditCards } = useExpenses()
 
     const [isOpen, setIsOpen] = useState(false)
-    
-    const [sortBy, setSortBy] = useState("date-desc")
-    const [filters, setFilters] = useState({
-        tipo: "all",
-        month: String(new Date().getMonth() + 1),
-        year: String(new Date().getFullYear()),
-        cardId: "all"
-    })
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
         severity: "success",
     })
-    const [appliedFilters, setAppliedFilters] = useState(filters)
 
+    // Usar mês e ano atuais por padrão
+    const currentMonth = new Date().getMonth()
+    const currentYear = new Date().getFullYear()
 
-    function applyFilters() {
-        setAppliedFilters(filters)
-    }
-
-    const filteredExpenses = useMemo(() => {
+    // Processar despesas para incluir parcelas de crédito
+    const processedExpenses = useMemo(() => {
         let data = [...(expenses ?? [])]
 
-        //remover as transações de crédito da lista princiapal, vai mostrar elas projetadas pela fatura
+        // Remover transações de crédito da lista principal
         data = data.filter(e => e.tipo !== 'Crédito')
 
-        // Projetar e AGRUPAR parcelas de crédito por cartão
+        // Projetar parcelas de crédito
         const projectedInstallments = []
-        const selectedMonth = appliedFilters.month === "all" ? null : Number(appliedFilters.month)
-        const selectedYear = appliedFilters.year === "all" ? null : Number(appliedFilters.year)
 
         creditCards.forEach(card => {
-            if (appliedFilters.cardId !== "all" && card.id !== appliedFilters.cardId) return
-
-           if (card.parcelas) {
+            if (card.parcelas) {
                 card.parcelas.forEach(parcela => {
                     const [pYear, pMonth, pDay] = parcela.purchaseDate.split("-").map(Number)
                     const purchaseDate = new Date(pYear, pMonth - 1, pDay)
@@ -71,13 +57,8 @@ export default function HomeMain() {
                         const invMonth = invoiceDate.getMonth() + 1
                         const invYear = invoiceDate.getFullYear()
 
-                        // Filtrar por mês/ano se aplicável
-                       if (selectedMonth && invMonth !== selectedMonth) continue
-                        if (selectedYear && invYear !== selectedYear) continue
-
-                        // Limpar observação de duplicatas do contador de parcelas
-                        let cleanDescription = parcela.description || 'Sem Observação';
-                        cleanDescription = cleanDescription.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+                        let cleanDescription = parcela.description || 'Sem Observação'
+                        cleanDescription = cleanDescription.replace(/\s*\(\d+\/\d+\)\s*$/, '')
 
                         projectedInstallments.push({
                             id: `${parcela.id}-inst-${i}`,
@@ -90,7 +71,7 @@ export default function HomeMain() {
                             observacao: `${cleanDescription} (${i + 1}/${parcela.installments})`,
                             cardId: card.id,
                             bank: card.bank,
-                            installments: parcela.installments, // Guardar info original para edição
+                            installments: parcela.installments,
                             totalValue: parcela.totalValue,
                             purchaseDate: parcela.purchaseDate
                         })
@@ -99,65 +80,27 @@ export default function HomeMain() {
             }
         })
 
-        // Unificar despesas comuns com as faturas agrupadas
+        // Unificar despesas
         data = [...data, ...projectedInstallments]
 
-        if (appliedFilters.tipo !== "all") {
-            if (appliedFilters.tipo === "Despesa") {
-                data = data.filter(e =>
-                    e.tipo === "Crédito" ||
-                    e.tipo === "Débito/Pix"
-                )
-            } else {
-                data = data.filter(e => e.tipo === appliedFilters.tipo)
-            }
-        }
-
-        if (appliedFilters.month !== "all" || appliedFilters.year !== "all") {
-            data = data.filter(e => {
-                if (!e?.data) return false
-                const [_, month, year] = e.data.split("/")
-                if (appliedFilters.month !== "all" && Number(month) !== Number(appliedFilters.month)) return false
-                if (appliedFilters.year !== "all" && Number(year) !== Number(appliedFilters.year)) return false
-                return true
-            })
-        }
-
-
-        switch (sortBy) {
-            case "value-desc":
-                data.sort((a, b) => b.valor - a.valor)
-                break
-            case "value-asc":
-                data.sort((a, b) => a.valor - b.valor)
-                break
-            case "date-asc":
-                data.sort((a, b) => {
-                    const dateA = new Date((a.data || "").split("/").reverse().join("-"))
-                    const dateB = new Date((b.data || "").split("/").reverse().join("-"))
-                    return dateA - dateB
-                })
-                break
-            case "date-desc":
-            default:
-                data.sort((a, b) => {
-                    const dateA = new Date((a.data || "").split("/").reverse().join("-"))
-                    const dateB = new Date((b.data || "").split("/").reverse().join("-"))
-                    return dateB - dateA
-                })
-        }
+        // Ordenar por data (mais recentes primeiro)
+        data.sort((a, b) => {
+            const dateA = new Date((a.data || "").split("/").reverse().join("-"))
+            const dateB = new Date((b.data || "").split("/").reverse().join("-"))
+            return dateB - dateA
+        })
 
         return data
-    }, [expenses, creditCards, sortBy, appliedFilters])
+    }, [expenses, creditCards])
 
+    // Calcular resumo financeiro
     const summary = useMemo(() => {
-        const baseSummary = (filteredExpenses ?? []).reduce(
+        const baseSummary = (processedExpenses ?? []).reduce(
             (acc, item) => {
                 if (item.tipo === "Receita") {
                     acc.entradas += item.valor
                     acc.total += item.valor
                 } else if (item.tipo !== "Crédito") {
-                    // Apenas Débito/Pix e Despesa comum entram aqui
                     acc.saidas += item.valor
                     acc.total -= item.valor
                 }
@@ -166,17 +109,15 @@ export default function HomeMain() {
             { entradas: 0, saidas: 0, total: 0 }
         )
 
+        // Adicionar gastos com cartão de crédito
         let creditCardOutflow = 0
-        const selectedMonth = appliedFilters.month === "all" ? new Date().getMonth() : Number(appliedFilters.month) - 1
-        const selectedYear = appliedFilters.year === "all" ? new Date().getFullYear() : Number(appliedFilters.year)
-
         if (creditCards && creditCards.length > 0) {
             creditCards.forEach(card => {
                 creditCardOutflow += calculateUsedLimit({
                     expenses,
                     creditCard: card,
-                    month: selectedMonth,
-                    year: selectedYear
+                    month: currentMonth,
+                    year: currentYear
                 })
             })
         }
@@ -185,7 +126,7 @@ export default function HomeMain() {
         baseSummary.total -= creditCardOutflow
 
         return baseSummary
-    }, [filteredExpenses, creditCards, expenses, appliedFilters])
+    }, [processedExpenses, creditCards, expenses, currentMonth, currentYear])
 
     return (
         <>
@@ -194,81 +135,48 @@ export default function HomeMain() {
                 setIsOpen={setIsOpen}
                 setSnackbar={setSnackbar}
             />
-            <section className="min-h-40 lg:h-55 bg-emerald-600 py-8 px-4">
 
-                <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:flex-wrap items-center gap-8 md:justify-between relative px-5">
+            {/* Header com fundo dark */}
+            <section className="bg-zinc-950 border-b border-zinc-800 py-6 px-4">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h1 className="text-white text-3xl lg:text-4xl font-bold mb-1">
+                            Dashboard Financeiro
+                        </h1>
+                        <p className="text-zinc-400 text-sm">
+                            Acompanhe suas receitas e despesas
+                        </p>
+                    </div>
                     
-                    <h1 className="text-white text-3xl lg:text-4xl font-semibold">Minhas Despesas</h1>
-                    <div className="flex items-center gap-3 flex-wrap sm:flex-row justify-center">
+                    <div className="flex items-center gap-3 flex-wrap">
                         <ImportExtract />
                         <button
                             type="button"
-                            className="flex items-center gap-1 rounded-md p-2 bg-emerald-500 text-white cursor-pointer hover:bg-emerald-700 transition-all duration-400 hover:-translate-y-0.5"
+                            className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-linear-to-br from-emerald-500/20 to-emerald-600/10 text-emerald-400 backdrop-blur-sm border border-emerald-500/20 cursor-pointer hover:shadow-emerald-700  hover:shadow-sm hover:-translate-y-0.5 transition-transform duration-300 font-medium"
                             onClick={() => setIsOpen(true)}
                         >
-                            <svg
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="size-6"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4.5v15m7.5-7.5h-15"
-                                />
-                            </svg>
+                            <Plus className="w-5 h-5" />
                             Nova Transação
                         </button>
                         <UserAuthButton />
                     </div>
-                    
                 </div>
             </section>
-            <section className="max-w-[1150px] mx-auto mt-4 lg:mt-0 px-4 lg:px-1">
-                <div className="w-full mx-auto gap-4 lg:-mt-[60px] flex flex-col lg:flex-row ">
-                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-2xl sm:text-3xl text-emerald-700 font-semibold">Entradas</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9 text-emerald-700">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.entradas)}</h1>
-                    </div>
-                    <div className="flex flex-col flex-1 bg-gray-100 rounded border-gray-300 shadow-md shadow-gray-300 p-3 justify-between w-full">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-2xl sm:text-3xl text-red-700 font-semibold">Saídas</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9 text-red-700">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.saidas)}</h1>
-                    </div>
-                    <div className="flex flex-col flex-1 bg-emerald-500 rounded border-gray-300 shadow-md p-3 justify-between w-full">
-                        <div className="flex justify-between items-center text-white">
-                            <h3 className="text-2xl sm:text-3xl font-semibold">Total</h3>
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 sm:size-9">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                        </div>
-                        <h1 className="text-white text-2xl sm:text-3xl font-semibold">{formatCurrency(summary.total)}</h1>
-                    </div>
+
+            {/* Conteúdo principal */}
+            <section className="min-h-screen bg-zinc-950 px-4 py-8">
+                <div className="max-w-7xl mx-auto">
+                    {/* Cards de resumo */}
+                    <DashboardCards summary={summary} />
+
+                    {/* Gráfico de cashflow */}
+                    <CashflowChart expenses={processedExpenses} />
+
+                    {/* Transações recentes */}
+                    <RecentTransactions expenses={processedExpenses} />
                 </div>
-                <ExpensesControls
-                    sortBy={sortBy}
-                    setSortBy={setSortBy}
-                    filters={filters}
-                    setFilters={setFilters}
-                    onApplyFilters={applyFilters}
-                    expenses={filteredExpenses}
-                    creditCards={creditCards}
-                />
-                <Table expenses={filteredExpenses} />
             </section>
+
             <AppSnackbar
                 open={snackbar.open}
                 message={snackbar.message}
@@ -276,5 +184,5 @@ export default function HomeMain() {
                 onClose={() => setSnackbar(s => ({ ...s, open: false }))}
             />
         </>
-    );
+    )
 }

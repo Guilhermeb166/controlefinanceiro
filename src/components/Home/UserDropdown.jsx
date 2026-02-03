@@ -34,7 +34,7 @@ export default function UserDropdown({ user }) {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="cursor-pointer flex items-center gap-2 rounded-md p-2 bg-emerald-500 text-white hover:bg-emerald-700 transition-all"
+                className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-linear-to-br from-emerald-500/20 to-emerald-600/10 text-emerald-400 backdrop-blur-sm border border-emerald-500/20 cursor-pointer hover:shadow-emerald-700  hover:shadow-sm hover:-translate-y-0.5 transition-transform duration-300 font-medium"
             >
                 <div className="relative w-6 h-6 rounded-full overflow-hidden">
                     <Image
