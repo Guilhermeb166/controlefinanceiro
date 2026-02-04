@@ -52,9 +52,7 @@ export default function CreditInstallmentModal({
 
         const valueToCharge = Number(totalValue)
 
-        //verificar se o cartão tem limite 
         if (!checkLimit(selectedCard, valueToCharge)) {
-            // se não tiver, verifica se outro cartão tem
             const cardWithLimit = cards.find(card => checkLimit(card, valueToCharge))
 
             if (cardWithLimit) {
@@ -65,7 +63,6 @@ export default function CreditInstallmentModal({
                 })
                 return
             } else {
-                //Nenhum cartão com limite
                 setLoading(true)
                 try{
                     await removeExpense(expenseId)

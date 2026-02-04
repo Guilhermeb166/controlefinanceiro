@@ -8,7 +8,7 @@ export default function Home() {
 
 
     return (
-        <main className="min-h-screen bg-neutral-200 pb-30">
+        <main className="min-h-screen bg-zinc-950 pb-30">
             <HomeMain />
         </main>
     );

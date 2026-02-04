@@ -128,7 +128,7 @@ export default function CashflowChart({ expenses }) {
 
     return (
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 ">
                 <div>
                     <h2 className="text-white text-xl font-semibold mb-1">Fluxo de Caixa</h2>
                 </div>
@@ -182,20 +182,21 @@ export default function CashflowChart({ expenses }) {
                 </FormControl>
             </div>
 
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300} >
                 <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgb(63 63 70)" />
                     <XAxis 
                         dataKey="name" 
                         stroke="rgb(161 161 170)"
                         tick={{ fill: 'rgb(161 161 170)' }}
+                        
                     />
                     <YAxis 
                         stroke="rgb(161 161 170)"
                         tick={{ fill: 'rgb(161 161 170)' }}
                         tickFormatter={(value) => `R$ ${value.toLocaleString('pt-BR')}`}
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={<CustomTooltip />} cursor={false}/>
                     <Legend 
                         wrapperStyle={{ color: 'white' }}
                         iconType="circle"
