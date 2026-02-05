@@ -1,5 +1,5 @@
 /**
- * Componente que agrupa os controles de ordenação, filtragem e exportação de despesas.
+ * Componente que agrupa os controles de ordenação, filtragem e exportação de despesas com Material UI
  */
 "use client"
 
@@ -7,7 +7,7 @@ import { useState } from "react"
 import { CiFilter } from "react-icons/ci"
 import FilterControl from "./FilterControl"
 import SortControl from "./SortControl"
-import { LuFileSpreadsheet } from "react-icons/lu";
+import { LuFileSpreadsheet } from "react-icons/lu"
 import { exportExpensesToExcel } from "@/utils/exportExpensesToExcel"
 
 export default function ExpensesControls({
@@ -35,13 +35,13 @@ export default function ExpensesControls({
 
     return (
         <>
-            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start mt-6">
+            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start p-6">
                 <SortControl sortBy={sortBy} setSortBy={setSortBy}/>
                 <div className="flex items-center gap-4 sm:gap-2">
                     <button
                         type="button"
                         onClick={()=>setIsFilterOpen(true)}
-                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                        className="relative bg-[#0F1419] cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-800 hover:bg-[#1a1f2e] text-white transition-colors"
                     >
                         <CiFilter size={20}/>
                         {activeFiltersCount > 0 && (
@@ -51,7 +51,7 @@ export default function ExpensesControls({
                                     flex items-center justify-center
                                     h-5 min-w-5 px-1
                                     rounded-full
-                                    bg-red-600
+                                    bg-emerald-600
                                     text-white
                                     text-xs
                                     font-semibold
@@ -64,7 +64,7 @@ export default function ExpensesControls({
                     <button
                         type="button"
                         onClick={()=> exportExpensesToExcel(expenses)}
-                        className="relative bg-white cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-300 hover:bg-gray-100"
+                        className="relative bg-[#0F1419] cursor-pointer flex items-center gap-2 px-4 sm:px-3 py-[9px] rounded-md border border-gray-800 hover:bg-[#1a1f2e] text-white transition-colors"
                     >
                         <LuFileSpreadsheet size={20}/>
                     </button>
@@ -73,7 +73,7 @@ export default function ExpensesControls({
             { isFilterOpen && (
                 // biome-ignore lint/a11y/useKeyWithClickEvents: <>
                 <div 
-                    className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+                    className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
                     onClick={(e) => {
                         if (e.target === e.currentTarget) {
                             setIsFilterOpen(false)
@@ -84,7 +84,7 @@ export default function ExpensesControls({
                     aria-labelledby="filter-dialog-title"
                 >
                 <div
-                    className="bg-white py-4 px-6 rounded-lg shadow-lg w-[90%] sm:w-full max-w-md border-none"
+                    className="bg-[#1a1f2e] py-6 px-6 rounded-lg shadow-lg w-[90%] sm:w-full max-w-md border border-gray-800"
                     role="dialog"
                     aria-modal="true"
                 >
@@ -98,7 +98,7 @@ export default function ExpensesControls({
                     <button
                         type="button"
                         onClick={() => setIsFilterOpen(false)}
-                        className="cursor-pointer  mt-3 w-full text-sm text-gray-500 hover:underline"
+                        className="cursor-pointer mt-4 w-full text-sm text-gray-400 hover:text-gray-300 transition-colors"
                     >
                         Cancelar
                     </button>

@@ -1,13 +1,13 @@
 /**
- * Tabela de exibição das transações filtradas, permitindo edição e exclusão.
+ * Tabela de exibição das transações filtradas com tema escuro
  */
 
 import { FaEdit, FaTrash } from "react-icons/fa"
 import { formatCurrency } from "@/utils/FormatCurrency"
 import { useState, useEffect } from "react"
-import EditModal from './EditModal';
+import EditModal from './EditModal'
 import { useExpenses } from "@/context/AppContext"
-import AppSnackbar from "../AppSnackbar";
+import AppSnackbar from "../AppSnackbar"
 
 export default function Table({ expenses }) {
     const { removeExpense } = useExpenses()
@@ -30,7 +30,6 @@ export default function Table({ expenses }) {
     async function confirmDelete() {
         if (!selected) return
         
-        // Se for uma parcela projetada, o ID real da despesa está em expenseId
         const idToDelete = selected.tipo === "Crédito" ? selected.expenseId : selected.id
         
         if (!idToDelete) {
@@ -82,10 +81,10 @@ export default function Table({ expenses }) {
         setOpenEdit(true)
     }
 
-
     return (
         <>
-            <div className="flex flex-col gap-3 mt-6 lg:hidden select-none">
+            {/* Mobile View */}
+            <div className="flex flex-col gap-3 mt-6 lg:hidden select-none px-4">
                 {(expenses ?? []).map(item => (
                     <div
                         key={item.id}
@@ -93,29 +92,28 @@ export default function Table({ expenses }) {
                     >
                         <div className="flex justify-between text-sm text-gray-500">
                             <span>{item.data}</span>
-                            <div className="flex items-center gap-6 text-2xl lg:text-lg">
+                            <div className="flex items-center gap-6 text-2xl">
                                 <FaEdit
-                                    className=" text-blue-600 hover:text-blue-800 cursor-pointer"
+                                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
                                     onClick={() => askEdit(item)}
                                 />
                                 <FaTrash
                                     className="text-red-600 hover:text-red-800 cursor-pointer"
                                     onClick={() => askDelete(item)}
                                 />
-                                
                             </div>
                         </div>
 
                         <h3 className="font-medium">{getCategoriaLabel(item)}</h3>
 
-                        <span className="text-sm text-gray-500 tracking-wide">{item.observacao || 'Sem Observação' }</span>
+                        <span className="text-sm text-gray-500 tracking-wide">{item.observacao || 'Sem Observação'}</span>
 
                         <div className="flex justify-between items-center">
                             <span className="font-semibold">
                                 {formatCurrency(item.valor)}
                             </span>
                             <span
-                                className={`lg:text-sm text-md font-medium ${item.tipo === "Receita"
+                                className={`text-md font-medium ${item.tipo === "Receita"
                                         ? "text-green-600"
                                         : "text-red-600"
                                     }`}
@@ -126,65 +124,79 @@ export default function Table({ expenses }) {
                     </div>
                 ))}
             </div>
-            <table className="hidden lg:table max-w-[1150px] w-full mt-10 mx-auto border-separate border-spacing-y-2 select-none ">
-                <thead>
-                    <tr>
-                        <th className="px-3 py-4 text-left tracking-[1px]">Data</th>
-                        <th className="px-3 py-4 text-left tracking-[1px]">Categoria</th>
-                        <th className="px-3 py-4 text-left tracking-[1px]">Observação</th>
-                        <th className="px-3 py-4 text-left tracking-[1px]">Preço</th>
-                        <th className="px-3 py-4 text-left tracking-[1px]">Tipo</th>
-                        <th className="px-3 py-4 text-left tracking-[1px]"></th>
-                        <th className="px-3 py-4 text-left tracking-[1px]"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(expenses ?? []).map((item) => {
-                        return (
-                            <tr key={item.id}>
-                                <td className="text-gray-400 pl-3 py-4 bg-white rounded-l-lg">{item.data}</td>
-                                <td className="text-gray-400 pl-3 py-4 bg-white">{getCategoriaLabel(item)}</td>
-                                <td className="text-gray-400 pl-3 py-4 bg-white">
-                                    {item.observacao ? (
-                                        <p className="text-sm text-gray-500">
-                                            {item.observacao}
-                                        </p>
-                                    ):  <p className="text-sm text-gray-500">
-                                            Sem Observação
-                                        </p>}
-                                </td>
-                                <td className="text-gray-400 pl-3 py-4 bg-white">{formatCurrency(item.valor)}</td>
-                                <td className={`text-gray-400 pl-3 py-4 bg-white ${item.tipo === 'Receita' ? 'text-green-600' : 'text-red-600'}`}>{item.tipo}</td>
-                                <td className="text-blue-600 lg:px-3 py-4 bg-white ">
-                                    <FaEdit className="  hover:text-blue-800 cursor-pointer text-xl" onClick={() => askEdit(item)}/>
-                                </td>
-                                <td className="text-red-600 lg:px-3 py-4 bg-white rounded-r-lg">
-                                    <FaTrash className=" cursor-pointer text-xl hover:text-red-700" onClick={() => askDelete(item)} />
-                                </td>
-                                
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+
+            {/* Desktop View - Tema Escuro */}
+            <div className="hidden lg:block px-6 pb-6">
+                <table className="w-full border-separate border-spacing-y-2 select-none">
+                    <thead>
+                        <tr>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium">Data</th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium">Categoria</th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium">Observação</th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium">Preço</th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium">Tipo</th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium"></th>
+                            <th className="px-4 py-4 text-left tracking-[1px] text-gray-400 font-medium"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {(expenses ?? []).map((item) => {
+                            return (
+                                <tr key={item.id} className="group">
+                                    <td className="text-gray-300 px-4 py-4 bg-[#0F1419] rounded-l-lg group-hover:bg-[#0c1014] transition-colors">
+                                        {item.data}
+                                    </td>
+                                    <td className="text-gray-300 px-4 py-4 bg-[#0F1419] group-hover:bg-[#0c1014] transition-colors">
+                                        {getCategoriaLabel(item)}
+                                    </td>
+                                    <td className="text-gray-300 px-4 py-4 bg-[#0F1419] group-hover:bg-[#0c1014] transition-colors">
+                                        {item.observacao ? (
+                                            <p className="text-sm text-gray-400">
+                                                {item.observacao}
+                                            </p>
+                                        ) : (
+                                            <p className="text-sm text-gray-500">
+                                                Sem Observação
+                                            </p>
+                                        )}
+                                    </td>
+                                    <td className="text-white font-semibold px-4 py-4 bg-[#0F1419] group-hover:bg-[#0c1014] transition-colors">
+                                        {formatCurrency(item.valor)}
+                                    </td>
+                                    <td className={`px-4 py-4 bg-[#0F1419] group-hover:bg-[#0c1014] transition-colors font-medium ${item.tipo === 'Receita' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        {item.tipo}
+                                    </td>
+                                    <td className="text-blue-500 px-4 py-4 bg-[#0F1419] group-hover:bg-[#0c1014] transition-colors">
+                                        <FaEdit className="hover:text-blue-400 cursor-pointer text-xl transition-colors" onClick={() => askEdit(item)}/>
+                                    </td>
+                                    <td className="text-red-500 px-4 py-4 bg-[#0F1419] rounded-r-lg group-hover:bg-[#0c1014] transition-colors">
+                                        <FaTrash className="cursor-pointer text-xl hover:text-red-400 transition-colors" onClick={() => askDelete(item)} />
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+
             {openPopup && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-                        <h2 className="text-lg font-semibold mb-3">Confirmar Exclusão</h2>
-                        <p className="text-gray-700 mb-4">
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                    <div className="bg-[#1a1f2e] p-6 rounded-lg shadow-lg w-80 border border-gray-800">
+                        <h2 className="text-lg font-semibold mb-3 text-white">Confirmar Exclusão</h2>
+                        <p className="text-gray-300 mb-4">
                             Tem certeza que deseja excluir esse registro?
                         </p>
                         <div className="flex justify-end gap-3">
                             <button
                                 type="button"
-                                className="cursor-pointer px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                className="cursor-pointer px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white transition-colors"
                                 onClick={() => setOpenPopup(false)}
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="button"
-                                className="cursor-pointer px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+                                className="cursor-pointer px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
                                 onClick={confirmDelete}
                             >
                                 Excluir
@@ -193,12 +205,14 @@ export default function Table({ expenses }) {
                     </div>
                 </div>
             )}
+            
             <EditModal
                 isOpen={openEdit}
                 setIsOpen={setOpenEdit}
                 expense={editing}
                 setSnackbar={setSnackbar}
             />
+            
             <AppSnackbar
                 open={snackbar.open}
                 message={snackbar.message}
