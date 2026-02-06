@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react"
 import Modal from 'react-modal'
 import dayjs from 'dayjs'
+import 'dayjs/locale/pt-br'
 
 import {
   FormControl,
@@ -74,7 +75,7 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
             // Se for crédito, o ID real da despesa está em expenseId
             const idToUpdate = expense.tipo === "Crédito" ? expense.expenseId : expense.id
 
-            await updateExpense(idToUpdate, {
+            const updateData = {
                 observacao: descricao || 'Sem Observação',
                 valor: Number(valor),
                 tipo,
@@ -85,17 +86,25 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
                 },
                 subcategoria: subcategoria
                 ? { id: subcategoria.id, nome: subcategoria.nome }: null,
-                // Campos específicos para crédito
-                installments: Number(installments),
-                cardId: expense.cardId
-            })
-        setSnackbar({
-            open: true,
-            message: 'Registro atualizado com sucesso!',
-            severity: 'success'
-        })
+            }
 
-        setIsOpen(false)
+            // Adicionar campos específicos para crédito apenas se existirem para evitar erro de undefined no Firebase
+            if (tipo === "Crédito") {
+                updateData.installments = Number(installments)
+                if (expense.cardId) {
+                    updateData.cardId = expense.cardId
+                }
+            }
+
+            await updateExpense(idToUpdate, updateData)
+            
+            setSnackbar({
+                open: true,
+                message: 'Registro atualizado com sucesso!',
+                severity: 'success'
+            })
+
+            setIsOpen(false)
         } catch (err) {
             console.error(err)
             alert('Erro ao atualizar registro')
@@ -121,17 +130,60 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
             </div>
 
             {/* DATA */}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
                 <DatePicker
                     label="Data"
                     value={data}
                     onChange={newValue => setData(newValue)}
-                    slotProps={{ textField: { fullWidth: true, size: 'small' } }}
+                    format="DD/MM/YYYY"
+                    slotProps={{ 
+                        textField: { 
+                            fullWidth: true, 
+                            size: 'small',
+                            sx: {
+                                "& .MuiOutlinedInput-root": {
+                                    "& fieldset": {
+                                        borderColor: "#d1d5dc",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#d1d5dc",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#009966",
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    "&.Mui-focused": {
+                                        color: "#009966",
+                                    },
+                                },
+                            }
+                        } 
+                    }}
                 />
             </LocalizationProvider>
 
             {/* CATEGORIA */}
-            <FormControl fullWidth size="small" className="mt-4">
+            <FormControl fullWidth size="small" className="mt-4"
+                sx={{
+                    "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&:hover fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&.Mui-focused fieldset": {
+                            borderColor: "#009966",
+                        },
+                    },
+                    "& .MuiInputLabel-root": {
+                        "&.Mui-focused": {
+                            color: "#009966",
+                        },
+                    },
+                }}
+            >
                 <InputLabel>Categoria</InputLabel>
                 <Select
                     value={categoria?.id || ''}
@@ -152,7 +204,26 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
 
             {/* SUBCATEGORIA */}
             {categoria?.subcategorias?.length > 0 && (
-                <FormControl fullWidth size="small" className="mt-4">
+                <FormControl fullWidth size="small" className="mt-4"
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#009966",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            "&.Mui-focused": {
+                                color: "#009966",
+                            },
+                        },
+                    }}
+                >
                 <InputLabel>Subcategoria</InputLabel>
                 <Select
                     value={subcategoria?.id || ''}
@@ -182,6 +253,24 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
                 className="mt-4"
                 value={descricao}
                 onChange={e => setDescricao(e.target.value)}
+                sx={{
+                    "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&:hover fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&.Mui-focused fieldset": {
+                            borderColor: "#009966",
+                        },
+                    },
+                    "& .MuiInputLabel-root": {
+                        "&.Mui-focused": {
+                            color: "#009966",
+                        },
+                    },
+                }}
             />
 
             {/* VALOR */}
@@ -197,11 +286,48 @@ export default function EditModal({isOpen, setIsOpen, expense, setSnackbar}) {
                     raw = raw.replace(/(\..*)\./g, '$1')
                     setValor(raw)
                 }}
+                sx={{
+                    "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&:hover fieldset": {
+                            borderColor: "#d1d5dc",
+                        },
+                        "&.Mui-focused fieldset": {
+                            borderColor: "#009966",
+                        },
+                    },
+                    "& .MuiInputLabel-root": {
+                        "&.Mui-focused": {
+                            color: "#009966",
+                        },
+                    },
+                }}
             />
 
             {/* PARCELAS (Apenas se for crédito) */}
             {tipo === "Crédito" && (
-                <FormControl fullWidth size="small" className="mt-4">
+                <FormControl fullWidth size="small" className="mt-4"
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "#d1d5dc",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#009966",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            "&.Mui-focused": {
+                                color: "#009966",
+                            },
+                        },
+                    }}
+                >
                     <InputLabel>Número de Parcelas</InputLabel>
                     <Select
                         value={installments}
